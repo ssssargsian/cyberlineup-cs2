@@ -55,27 +55,21 @@ jobs:
           username: ${{ secrets.CYBERLINEUP_USER }}
           key: ${{ secrets.CYBERLINEUP_SSH_KEY }}
           port: 22
-          debug: true
           script_stop: true
           command_timeout: 30m
           script: |
-            set -Eeuxo pipefail
+            set -Eeuo pipefail
 
             echo "=== Connected ==="
             whoami
             hostname
-            pwd
 
-            echo "=== Check files ==="
-            ls -la /opt/cyberlineup || true
+            echo "=== Check deploy script ==="
             ls -la /opt/cyberlineup/deploy.sh
-            head -n 30 /opt/cyberlineup/deploy.sh
 
-            echo "=== Check app ==="
-            ls -la /var/www/cyberlineup-sr
-            cd /var/www/cyberlineup-sr
-            git status --short
-            git remote -v
+            echo "=== Check app git as cyberlineup ==="
+            sudo -u cyberlineup bash -lc 'cd /var/www/cyberlineup-sr && git status --short'
+            sudo -u cyberlineup bash -lc 'cd /var/www/cyberlineup-sr && git remote -v'
 
             if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
               RUN_MIGRATIONS="${{ inputs.run_migrations }}"
@@ -90,8 +84,6 @@ jobs:
             echo "RUN_MIGRATIONS=$RUN_MIGRATIONS"
             echo "RUN_SYNC=$RUN_SYNC"
             echo "RUN_PUBLISH=$RUN_PUBLISH"
-
-            echo "=== Run deploy ==="
 
             sudo env \
               RUN_MIGRATIONS="$RUN_MIGRATIONS" \

@@ -12,29 +12,35 @@ CyberLineup SR выглядит как премиальный CS2-инструм
 - CYBERSHOKE server browser
 - Apple/Linear аккуратность
 
-Не копировать чужой дизайн напрямую. Стиль: dark tactical premium, стеклянные игровые панели, крупные превью, понятные бейджи и быстрый визуальный разбор `тип гранаты → карта → откуда → куда`.
+Не копировать чужой дизайн напрямую. Стиль: Dark Tactical Esports, плотные игровые dashboard-панели, крупные превью, оранжевые FACEIT-like CTA, cyan/tooling accents и быстрый визуальный разбор `тип гранаты → карта → откуда → куда`.
 
 ## Colors
 Background:
-- `#05070D`
-- `#070A12`
-- `#0B1020`
+- main `#05070D`
+- panel dark `#0B0F18`
+- panel `#111827`
+- panel elevated `#151B28`
+- tactical blue `#0A1420`
 
 Panels:
-- `rgba(13, 18, 32, 0.86)`
-- `rgba(255, 255, 255, 0.04)`
+- solid tactical panels: `#0B0F18` at 90-95%
+- inner blocks: `rgba(255,255,255,0.04)`
+- black HUD panels: `rgba(0,0,0,0.25-0.35)`
 
 Borders:
-- `rgba(255,255,255,0.08)`
-- `rgba(34,211,238,0.22)`
+- default `rgba(255,255,255,0.08)`
+- strong `rgba(255,255,255,0.14)`
+- active cyan `rgba(34,211,238,0.45)`
+- active orange `rgba(245,158,11,0.45)`
 
 Accents:
+- FACEIT orange `#FF5500`
+- CS2 amber `#F59E0B`
 - cyan `#22D3EE`
 - blue `#3B82F6`
 - violet `#8B5CF6`
-- orange `#F59E0B`
-- red-orange `#F97316`
 - green `#22C55E`
+- red `#EF4444`
 
 Utility colors:
 - Смок: cyan/blue
@@ -61,10 +67,10 @@ Utility colors:
 - изображения на mobile во всю ширину, без поломки карточек.
 
 ## Cards
-- `rounded-2xl` или `rounded-3xl`;
-- glassmorphism;
+- `rounded-xl`, `rounded-2xl` или `rounded-[1.5rem]`;
+- меньше стекла, больше solid tactical panels;
 - soft border;
-- subtle cyan/violet glow;
+- subtle orange/cyan/violet glow;
 - hover lift;
 - preview image сверху;
 - image zoom около `1.03` on hover;
@@ -74,15 +80,15 @@ Utility colors:
 
 ## Buttons
 Primary:
-- cyan/blue/violet gradient;
+- orange → amber gradient, обычно `#FF5500 → #F97316 → #F59E0B`;
 - glow on hover;
-- `rounded-xl` или `rounded-2xl`;
+- `rounded-xl`;
 - clear CTA.
 
 Secondary:
-- transparent;
-- border;
-- soft hover.
+- cyan/blue outline;
+- dark panel background;
+- soft hover glow.
 
 Danger:
 - rose/red border;
@@ -112,14 +118,12 @@ HE:
 
 ## Pages
 Главная:
-- крупный логотип CyberLineup SR;
-- подзаголовок `ИИ-помощник по раскидам CS2`;
-- большой поиск;
+- hero `Раскиды CS2 за секунды`;
+- подзаголовок про смоки, флешки, молотовы и HE;
+- большой поиск с orange primary CTA;
 - примеры запросов;
-- быстрые карты;
-- блоки Smoke / Flash / Molotov / HE можно оставлять как игровые категории, но UI-labels должны быть русскими;
-- блок `База раскидов`;
-- блок `Импортировано из источников`.
+- dashboard stats: всего раскидов, карт, смоков, флешек, молотовых;
+- карты как быстрые входы в базу.
 
 Search:
 - фильтры сверху на mobile, сеткой на desktop;
@@ -134,10 +138,17 @@ Lineup detail:
 - title через `formatLineupTitleRu()`;
 - карта, тип гранаты, `from → target`;
 - блок `Как кинуть` со step images;
-- блок `Детали`;
-- блок `Источник`;
+- справа sticky panel `Детали раскида`;
+- блок `Источник` в sidebar;
 - галерея `images[]`, если есть;
 - похожие раскиды.
+
+Images:
+- `ImportedImage` использует обычный `img`, если remote/Punycode мешает Next Image;
+- фото видно сразу, без `opacity-0`;
+- hover может только слегка увеличить изображение (`scale 1.02-1.03`) или добавить glow;
+- overlay не должен закрывать изображение полностью;
+- fallback показывается только если `src` пустой или загрузка упала.
 
 Admin:
 - проще и функциональнее, но в том же стиле;
@@ -157,6 +168,8 @@ Admin:
 - EmptyState
 - LoadingSkeleton
 - LineupCard
+- MapCard
+- ImportedImage
 - UtilityTypeBadge
 - DifficultyBadge
 - SourceBadge

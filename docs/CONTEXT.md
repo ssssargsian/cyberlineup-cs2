@@ -62,10 +62,13 @@ CyberLineup SR — платформа поиска раскидов CS2 с им�
 - New import-generated slugs use Latin-only `safeLatinSlug()` with a short source hash.
 - Canonical Dust map is `Dust 2` with slug `dust-2`; `repair:maps` merges old `Dust II`/`dust-ii` duplicates.
 - Imported and remote images render through `ImportedImage`, so photos are visible immediately and fallback appears only on load error or empty `src`.
+- Public UI was redesigned toward Dark Tactical Esports: FACEIT-like orange CTA, solid tactical panels, denser cards, CS2-style dashboard stats and Russian-only public labels.
 - Seed demo lineups are now `rejected`, not public.
 - Added CLI scripts to publish real imported data, hide demo data, merge duplicate maps, repair old unsafe slugs and run one-command bootstrap.
 - Latest local DB maintenance on 2026-07-08: `repair:maps` found 0 duplicate maps, `repair:lineup-slugs` repaired 0 and skipped 1096, `hide:demo` hid 9 demo lineups, `publish:imported` published 0 new records because matching imports were already published or not pending.
-- `pnpm prisma generate` and `pnpm build` passed on 2026-07-08 after the latest UI/image/map changes.
+- `pnpm build` and `pnpm exec tsc --noEmit` passed on 2026-07-08 after the Dark Tactical Esports redesign.
+- Local HTTP checks on 2026-07-08 returned 200 for `/`, `/search?q=молик car inferno`, `/search?q=molotov inferno`, `/maps/inferno`, `/lineups/smoke-ct-spawn-mid-inferno-15x9wm` and `/assistant`.
+- Search/map/detail pages render remote imported images immediately through `ImportedImage`; code audit found no `opacity-0`, `group-hover:opacity-100`, `brightness-0` or `invisible` in public image components/pages.
 
 ## What is incomplete
 - 10 imported records from the latest audit had `utilityType = unknown`; these need manual moderation/classification.
@@ -104,3 +107,4 @@ CyberLineup SR — платформа поиска раскидов CS2 с им�
 - Не переводить `sourceUrl` и `slug`.
 - UI должен быть на русском.
 - Дизайн должен соответствовать `docs/DESIGN_SYSTEM.md`.
+- Новые публичные UI-правки должны сохранять Dark Tactical Esports стиль: solid panels, orange primary CTA, cyan secondary accents and visible-by-default images.

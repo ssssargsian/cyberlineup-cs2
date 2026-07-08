@@ -34,45 +34,47 @@ type LineupCardProps = {
 
 export function LineupCard({ lineup }: LineupCardProps) {
   const displayTitle = formatLineupTitleRu(lineup.title);
+  const displayMapName = formatMapNameRu(lineup.map.name, lineup.map.slug);
 
   return (
-    <motion.div whileHover={{ y: -7 }} transition={{ duration: 0.18 }}>
-      <Link href={`/lineups/${lineup.slug}`} className="group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(13,18,32,0.86)] shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl transition hover:border-cyan-400/30 hover:shadow-[0_22px_90px_rgba(34,211,238,0.14)]">
-        <div className="relative h-56 overflow-hidden border-b border-white/10">
+    <motion.div className="h-full" whileHover={{ y: -3 }} transition={{ duration: 0.18 }}>
+      <Link href={`/lineups/${lineup.slug}`} className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 shadow-[0_20px_70px_rgba(0,0,0,0.3)] transition duration-200 hover:border-orange-400/35 hover:shadow-[0_24px_90px_rgba(255,85,0,0.14)]">
+        <div className="relative aspect-[16/10] overflow-hidden border-b border-white/10 bg-[#05070d]">
           <ImportedImage
             src={lineup.previewImageUrl}
             alt={displayTitle}
             className="absolute inset-0"
             imgClassName="transition duration-500 group-hover:scale-[1.03]"
+            fallbackLabel="Фото не добавлено"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/88 via-[#05070D]/18 to-black/10" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/84 via-[#05070D]/12 to-black/15" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-2">
             <UtilityTypeBadge value={lineup.utilityType} />
             <DifficultyBadge value={lineup.difficulty} />
           </div>
-          <div className="absolute bottom-4 left-4 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-xs font-medium text-cyan-100 backdrop-blur-md">
-            {formatMapNameRu(lineup.map.name, lineup.map.slug)}
+          <div className="absolute bottom-4 left-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+            {displayMapName}
           </div>
         </div>
 
         <div className="flex flex-1 flex-col gap-4 p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="mb-2 text-xs uppercase tracking-[0.24em] text-cyan-300">CS2 раскид</div>
-              <h3 className="text-xl font-semibold leading-tight text-white transition group-hover:text-cyan-100">{displayTitle}</h3>
+              <div className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-orange-200">CS2 раскид</div>
+              <h3 className="line-clamp-2 text-xl font-black leading-tight text-white transition group-hover:text-orange-50">{displayTitle}</h3>
             </div>
             {lineup.isVerified ? <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-300" /> : null}
           </div>
 
           <div className="grid gap-3 text-sm text-slate-300">
-            <div className="inline-flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-slate-500" />
+            <div className="inline-flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
+              <MapPin className="h-4 w-4 text-cyan-300" />
               {formatAreaRu(lineup.area)}
             </div>
-            <div className="inline-flex items-center gap-2 text-slate-400">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-white/8 bg-black/20 px-3 py-2 text-slate-300">
               <span className="truncate">{lineup.fromPosition ?? "Позиция не указана"}</span>
-              <MoveRight className="h-4 w-4 shrink-0" />
+              <MoveRight className="h-4 w-4 shrink-0 text-orange-300" />
               <span className="truncate">{lineup.targetPosition ?? "Цель не указана"}</span>
             </div>
           </div>
@@ -88,8 +90,8 @@ export function LineupCard({ lineup }: LineupCardProps) {
             ) : null}
           </div>
 
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-cyan-200">
-            Открыть
+          <div className="mt-auto inline-flex items-center justify-between rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-black text-orange-100 transition group-hover:border-orange-300/45 group-hover:bg-orange-500/[0.16]">
+            <span>Открыть</span>
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
           </div>
         </div>

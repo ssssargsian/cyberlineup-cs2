@@ -8,7 +8,7 @@ export function SourceBadge({ name }: { name?: string | null }) {
   }
 
   return (
-    <Badge className="border-violet-400/25 bg-violet-500/12 text-violet-200">
+    <Badge className="border-cyan-300/25 bg-cyan-400/10 text-cyan-100">
       <Link2 className="mr-1 h-3 w-3" />
       {name}
     </Badge>

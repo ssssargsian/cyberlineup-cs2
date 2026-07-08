@@ -13,11 +13,11 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 28%),
-    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.14), transparent 24%),
-    radial-gradient(circle at bottom, rgba(168, 85, 247, 0.12), transparent 28%),
-    linear-gradient(180deg, #05070d, #080b14 58%, #090d18 100%);
-  color: #e5eefc;
+    radial-gradient(circle at 18% 12%, rgba(255, 85, 0, 0.13), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(34, 211, 238, 0.12), transparent 24%),
+    radial-gradient(circle at 70% 88%, rgba(139, 92, 246, 0.1), transparent 28%),
+    linear-gradient(180deg, #05070d, #070a12 48%, #0a1420 100%);
+  color: #f8fafc;
   font-family: "Sora", "Avenir Next", "Segoe UI", sans-serif;
 }
 
@@ -30,26 +30,51 @@ h4 {
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.28);
+  background: rgba(255, 85, 0, 0.35);
   color: #f8fbff;
 }
 
 .glass-card {
-  @apply border border-white/10 bg-white/5 shadow-[0_20px_80px_rgba(2,6,23,0.42)] backdrop-blur-xl;
+  @apply border border-white/10 bg-[#0b0f18]/90 shadow-[0_22px_80px_rgba(0,0,0,0.32)] ring-1 ring-white/[0.03];
+}
+
+.tactical-panel {
+  @apply relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/90 shadow-[0_22px_80px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.03];
+}
+
+.tactical-panel::before {
+  content: "";
+  @apply pointer-events-none absolute inset-0 opacity-80;
+  background:
+    linear-gradient(135deg, rgba(255, 85, 0, 0.1), transparent 30%),
+    radial-gradient(circle at 86% 12%, rgba(34, 211, 238, 0.1), transparent 32%);
+}
+
+.tactical-panel::after {
+  content: "";
+  @apply pointer-events-none absolute inset-0 opacity-40;
+  background:
+    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.tactical-label {
+  @apply text-xs font-bold uppercase tracking-[0.22em];
 }
 
 .section-title {
-  @apply text-3xl font-semibold text-white sm:text-4xl;
+  @apply text-3xl font-black leading-tight text-white sm:text-4xl;
 }
 
 .section-copy {
-  @apply text-sm leading-7 text-slate-400 sm:text-base;
+  @apply text-sm leading-7 text-slate-300 sm:text-base;
 }
 
 .admin-input {
-  @apply w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/30 focus:bg-slate-950/80;
+  @apply w-full rounded-xl border border-white/10 bg-[#05070d]/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-orange-400/45 focus:bg-[#05070d]/90;
 }
 
 .admin-button {
-  @apply inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:opacity-90;
+  @apply inline-flex items-center justify-center rounded-xl border border-orange-400/40 bg-gradient-to-r from-[#ff5500] via-[#f97316] to-[#f59e0b] px-5 py-3 text-sm font-bold text-white shadow-[0_0_28px_rgba(255,85,0,0.22)] transition hover:border-orange-300/60 hover:shadow-[0_0_38px_rgba(255,85,0,0.34)];
 }

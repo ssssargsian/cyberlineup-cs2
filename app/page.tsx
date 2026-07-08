@@ -1,11 +1,11 @@
-import { ArrowRight, Bot, CheckCheck, DatabaseZap, Search, Sparkles, Video } from "lucide-react";
+import { ArrowRight, Bot, CheckCheck, Crosshair, DatabaseZap, Flame, MapPinned, Search, Sparkles, Video, Zap } from "lucide-react";
 import Link from "next/link";
 
 import { LineupCard } from "@/components/LineupCard";
 import { MapCard } from "@/components/MapCard";
 import { SearchBar } from "@/components/SearchBar";
 import { prisma } from "@/lib/prisma";
-import { BENEFITS, POPULAR_QUERIES, APP_SUBTITLE, APP_TAGLINE, MAPS } from "@/src/lib/catalog";
+import { BENEFITS, POPULAR_QUERIES } from "@/src/lib/catalog";
 import { LineupStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -21,34 +21,35 @@ function canonicalMapKey(map: { name: string; slug: string }) {
 }
 
 export default async function HomePage() {
-  const [maps, featuredLineups] = await Promise.all([
+  const publicLineupWhere = {
+    status: LineupStatus.published,
+    NOT: {
+      OR: [{ slug: { startsWith: "demo-" } }, { sourceName: { contains: "Demo", mode: "insensitive" as const } }, { tags: { has: "demo" } }]
+    }
+  };
+
+  const [maps, featuredLineups, totalLineups, utilityCounters] = await Promise.all([
     prisma.map.findMany({
       include: {
         _count: {
           select: {
-            lineups: {
-              where: {
-                status: LineupStatus.published,
-                NOT: {
-                  OR: [{ slug: { startsWith: "demo-" } }, { sourceName: { contains: "Demo", mode: "insensitive" } }, { tags: { has: "demo" } }]
-                }
-              }
-            }
+            lineups: { where: publicLineupWhere }
           }
         }
       },
       orderBy: { name: "asc" }
     }),
     prisma.lineup.findMany({
-      where: {
-        status: LineupStatus.published,
-        NOT: {
-          OR: [{ slug: { startsWith: "demo-" } }, { sourceName: { contains: "Demo", mode: "insensitive" } }, { tags: { has: "demo" } }]
-        }
-      },
+      where: publicLineupWhere,
       include: { map: true },
       orderBy: [{ isVerified: "desc" }, { updatedAt: "desc" }],
       take: 6
+    }),
+    prisma.lineup.count({ where: publicLineupWhere }),
+    prisma.lineup.groupBy({
+      by: ["utilityType"],
+      where: publicLineupWhere,
+      _count: true
     })
   ]);
   const mapCards = Array.from(
@@ -83,50 +84,60 @@ export default async function HomePage() {
       }, new Map())
       .values()
   );
+  const utilityCounterMap = Object.fromEntries(utilityCounters.map((entry) => [entry.utilityType, entry._count]));
+  const stats = [
+    { label: "Всего раскидов", value: totalLineups, icon: DatabaseZap, accent: "from-[#ff5500] to-[#f59e0b]" },
+    { label: "Карт", value: mapCards.length, icon: MapPinned, accent: "from-cyan-300 to-blue-500" },
+    { label: "Смоков", value: utilityCounterMap.smoke ?? 0, icon: Crosshair, accent: "from-cyan-300 to-blue-500" },
+    { label: "Флешек", value: utilityCounterMap.flash ?? 0, icon: Zap, accent: "from-yellow-300 to-amber-500" },
+    { label: "Молотовых", value: utilityCounterMap.molotov ?? 0, icon: Flame, accent: "from-orange-400 to-red-500" }
+  ];
 
   return (
-    <div className="space-y-14 pb-16">
-      <section className="glass-card overflow-hidden rounded-[2.5rem] px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
-        <div className="grid gap-10 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
+    <div className="space-y-12 pb-16">
+      <section className="tactical-panel px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
+        <div className="relative grid gap-10 lg:grid-cols-[1.12fr,0.88fr] lg:items-center">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/15 bg-cyan-400/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-cyan-200">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-orange-200">
               <Bot className="h-3.5 w-3.5" />
-              {APP_TAGLINE}
+              ИИ-помощник по раскидам CS2
             </div>
-            <h1 className="max-w-4xl text-5xl font-semibold leading-[0.95] text-white sm:text-6xl lg:text-7xl">
-              Находите раскиды в CS2 человеческим языком.
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.9] text-white sm:text-6xl lg:text-7xl">
+              Раскиды CS2 за секунды
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">{APP_SUBTITLE}</p>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+              Смоки, флешки, молотовы и HE по картам. Ищите обычным языком и открывайте раскиды с фото шагов.
+            </p>
 
             <div className="mt-8">
-              <SearchBar actionPath="/search" large />
+              <SearchBar actionPath="/search" large buttonLabel="Найти раскид" />
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              {MAPS.map((map) => (
+              {["смок б даст", "молик банан инферно", "flash mid mirage", "smoke ct spawn mid inferno"].map((query) => (
                 <Link
-                  key={map.slug}
-                  href={`/maps/${map.slug}`}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400/25 hover:bg-cyan-400/10 hover:text-white"
+                  key={query}
+                  href={`/search?q=${encodeURIComponent(query)}`}
+                  className="rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-orange-400/30 hover:bg-orange-500/10 hover:text-white"
                 >
-                  {map.name}
+                  {query}
                 </Link>
               ))}
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {POPULAR_QUERIES.map((query, index) => (
+          <div className="grid gap-4">
+            {POPULAR_QUERIES.slice(0, 4).map((query, index) => (
               <Link
                 key={query}
                 href={`/search?q=${encodeURIComponent(query)}`}
-                className="glass-card flex min-h-[8rem] flex-col justify-between rounded-[1.75rem] p-4 transition hover:border-cyan-400/20 hover:bg-white/10"
+                className="group flex min-h-[7.5rem] flex-col justify-between rounded-2xl border border-white/10 bg-black/25 p-4 transition hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-cyan-400/10"
               >
-                <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Популярный запрос {String(index + 1).padStart(2, "0")}</div>
-                <div className="text-lg font-medium text-white">{query}</div>
-                <div className="inline-flex items-center gap-2 text-sm text-cyan-200">
+                <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Популярный запрос {String(index + 1).padStart(2, "0")}</div>
+                <div className="text-lg font-black text-white">{query}</div>
+                <div className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200">
                   Открыть поиск
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </div>
               </Link>
             ))}
@@ -134,13 +145,34 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+            <div key={stat.label} className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.26)]">
+              <div className={`mb-5 h-1 w-16 rounded-full bg-gradient-to-r ${stat.accent}`} />
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-4xl font-black text-white">{stat.value}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-400">{stat.label}</div>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-orange-200">
+                  <Icon className="h-5 w-5" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
       <section className="grid gap-5 lg:grid-cols-5">
         {BENEFITS.map((benefit, index) => {
           const Icon = icons[index] ?? Sparkles;
 
           return (
-            <div key={benefit} className="glass-card rounded-[2rem] p-5">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-cyan-200">
+            <div key={benefit} className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/85 p-5">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-400/10 text-cyan-200">
                 <Icon className="h-5 w-5" />
               </div>
               <div className="text-sm leading-7 text-slate-300">{benefit}</div>
@@ -152,7 +184,7 @@ export default async function HomePage() {
       <section className="space-y-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Карты</div>
+            <div className="tactical-label text-orange-200">Карты</div>
             <h2 className="section-title mt-2">Карты и быстрые входы в базу</h2>
           </div>
           <p className="section-copy max-w-2xl">Открывайте карту целиком, фильтруйте по типам гранат и работайте только с опубликованными записями.</p>
@@ -173,10 +205,10 @@ export default async function HomePage() {
       <section className="space-y-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Подборка</div>
+            <div className="tactical-label text-orange-200">Подборка</div>
             <h2 className="section-title mt-2">Опубликованные раскиды</h2>
           </div>
-          <Link href="/search" className="inline-flex items-center gap-2 text-sm text-cyan-200">
+          <Link href="/search" className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200">
             Перейти к поиску
             <ArrowRight className="h-4 w-4" />
           </Link>

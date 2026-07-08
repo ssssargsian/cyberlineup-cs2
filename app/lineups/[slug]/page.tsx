@@ -1,4 +1,4 @@
-import { ExternalLink, Flag, MapPinned, ShieldCheck } from "lucide-react";
+import { Crosshair, ExternalLink, Flag, MapPinned, Route, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -113,10 +113,11 @@ export default async function LineupPage({ params }: { params: { slug: string } 
 
   return (
     <div className="space-y-8 pb-16">
-      <section className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-[rgba(13,18,32,0.86)] shadow-[0_28px_110px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+      <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/95 shadow-[0_28px_110px_rgba(0,0,0,0.36)]">
         <div className="relative min-h-[18rem] border-b border-white/10 sm:min-h-[24rem]">
           <ImportedImage src={heroImageUrl} alt={displayTitle} className="absolute inset-0" imgClassName="object-cover" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/90 via-[#05070D]/45 to-black/10" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/92 via-[#05070D]/38 to-black/10" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
           <div className="relative flex min-h-[18rem] flex-col justify-end p-6 sm:min-h-[24rem] sm:p-8">
             <div className="mb-4 flex flex-wrap gap-2">
               <UtilityTypeBadge value={lineup.utilityType} />
@@ -125,45 +126,53 @@ export default async function LineupPage({ params }: { params: { slug: string } 
               {lineup.isVerified ? <Badge className="border-emerald-400/25 bg-emerald-500/10 text-emerald-200">Проверено</Badge> : null}
               <SourceBadge name={lineup.sourceName} />
             </div>
-            <h1 className="max-w-5xl text-4xl font-semibold leading-tight text-white sm:text-5xl">{displayTitle}</h1>
+            <h1 className="max-w-5xl text-4xl font-black leading-tight text-white sm:text-6xl">{displayTitle}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-200">
-              <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1">{displayMapName}</span>
-              <span>{lineup.fromPosition ?? "Позиция не указана"} → {lineup.targetPosition ?? "Цель не указана"}</span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-500/10 px-3 py-1 font-semibold text-orange-100">
+                <MapPinned className="h-4 w-4" />
+                {displayMapName}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-3 py-1">
+                <Route className="h-4 w-4 text-cyan-200" />
+                {lineup.fromPosition ?? "Позиция не указана"} → {lineup.targetPosition ?? "Цель не указана"}
+              </span>
             </div>
             <p className="mt-5 max-w-3xl text-base leading-8 text-slate-200">{lineup.description ?? "Описание пока не добавлено."}</p>
           </div>
         </div>
 
         <div className="p-6 sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
+        <div className="grid gap-5 lg:grid-cols-4">
           <div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Карта</div>
-                <Link href={`/maps/${lineup.map.slug}`} className="inline-flex items-center gap-2 text-lg font-semibold text-cyan-200">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Карта</div>
+                <Link href={`/maps/${lineup.map.slug}`} className="inline-flex items-center gap-2 text-lg font-black text-cyan-200">
                   <MapPinned className="h-4 w-4" />
                   {displayMapName}
                 </Link>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Зона</div>
-                <div className="text-lg font-semibold text-white">{formatAreaRu(lineup.area)}</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Зона</div>
+                <div className="inline-flex items-center gap-2 text-lg font-black text-white">
+                  <Crosshair className="h-4 w-4 text-orange-200" />
+                  {formatAreaRu(lineup.area)}
+                </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Откуда</div>
-                <div className="text-lg font-semibold text-white">{lineup.fromPosition ?? "Не указано"}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Откуда</div>
+                <div className="truncate text-lg font-black text-white">{lineup.fromPosition ?? "Не указано"}</div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Куда</div>
-                <div className="text-lg font-semibold text-white">{lineup.targetPosition ?? "Не указано"}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Куда</div>
+                <div className="truncate text-lg font-black text-white">{lineup.targetPosition ?? "Не указано"}</div>
               </div>
-            </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 lg:col-span-4">
               <CopyLinkButton url={currentUrl} />
               <a
                 href={`mailto:raskidki-granat@mail.ru?subject=${encodeURIComponent(`Ошибка в раскиде: ${displayTitle}`)}&body=${encodeURIComponent(`Проверьте раскид: ${currentUrl}`)}`}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 transition hover:border-rose-400/20 hover:bg-rose-500/10"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-red-400/30 hover:bg-red-500/10"
               >
                 <Flag className="h-4 w-4" />
                 Сообщить об ошибке
@@ -173,112 +182,101 @@ export default async function LineupPage({ params }: { params: { slug: string } 
                   href={lineup.sourceUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/20 hover:bg-cyan-400/10"
+                  className="inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40 hover:bg-orange-500/15"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Источник
                 </a>
               ) : null}
             </div>
-          </div>
-
-          <div className="space-y-5">
-            <VideoEmbed url={lineup.videoUrl} />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Тип броска</div>
-                <div className="text-base font-medium text-white">{formatThrowTypeRu(lineup.throwType)}</div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-500">Статус</div>
-                <div className="inline-flex items-center gap-2 text-base font-medium text-emerald-200">
-                  <ShieldCheck className="h-4 w-4" />
-                  {formatStatusRu(lineup.status)}
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.15fr,0.85fr]">
-        <div className="glass-card rounded-[2rem] p-6">
-          <h2 className="text-2xl font-semibold text-white">Как кинуть</h2>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr),24rem]">
+        <div className="space-y-6">
+        <div className="rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
+          <h2 className="text-3xl font-black text-white">Как кинуть</h2>
           <ol className="mt-5 space-y-3">
             {steps.length ? (
               steps.map((step, index) => (
-                <li key={`${step.title}-${index}`} className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm leading-7 text-slate-200">
+                <li key={`${step.title}-${index}`} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-7 text-slate-200">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start">
                     <div className="md:min-w-20">
-                      <div className="text-xs uppercase tracking-[0.24em] text-cyan-300">{String(index + 1).padStart(2, "0")}</div>
+                      <div className="text-3xl font-black text-orange-200">{String(index + 1).padStart(2, "0")}</div>
                     </div>
                     <div className="flex-1">
-                      <div className="text-base font-semibold text-white">{step.title}</div>
+                      <div className="text-base font-black text-white">{step.title}</div>
                       <p className="mt-2 text-sm leading-7 text-slate-300">{step.text}</p>
                       <ImportedImage
                         src={step.localImageUrl ?? step.imageUrl}
                         alt={step.title}
                         fallbackLabel="Фото шага пока нет"
                         className="mt-4 aspect-video w-full rounded-2xl border border-white/10"
+                        imgClassName="transition duration-500 hover:scale-[1.02]"
                       />
                     </div>
                   </div>
                 </li>
               ))
             ) : (
-              <li className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-slate-400">Шаги пока не добавлены.</li>
+              <li className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-400">Шаги пока не добавлены.</li>
             )}
           </ol>
         </div>
 
-        <div className="space-y-6">
-          <div className="glass-card rounded-[2rem] p-6">
-            <h2 className="text-2xl font-semibold text-white">Детали</h2>
+        {galleryImages.length ? (
+          <section className="space-y-5">
+            <h2 className="text-3xl font-black text-white">Фотографии</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {galleryImages.map((image) => (
+                <a key={image.url} href={image.sourceUrl} target="_blank" rel="noreferrer" className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 transition hover:-translate-y-1 hover:border-cyan-400/25">
+                  <ImportedImage src={image.localUrl ?? image.url} alt={image.alt} className="aspect-video w-full" imgClassName="transition duration-500 hover:scale-[1.03]" />
+                </a>
+              ))}
+            </div>
+          </section>
+        ) : null}
+        </div>
+
+        <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+          <VideoEmbed url={lineup.videoUrl} />
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
+            <h2 className="text-2xl font-black text-white">Детали раскида</h2>
             <div className="mt-5 grid gap-3 text-sm text-slate-300">
               <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Карта</span><span className="text-white">{displayMapName}</span></div>
+              <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Тип гранаты</span><span className="text-white">{lineup.utilityType === "unknown" ? "Не указана" : <UtilityTypeBadge value={lineup.utilityType} />}</span></div>
               <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Зона</span><span className="text-white">{formatAreaRu(lineup.area)}</span></div>
               <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Сторона</span><span className="text-white">{formatSideRu(lineup.side)}</span></div>
+              <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Сложность</span><span className="text-white">{lineup.difficulty === "unknown" ? "Не указана" : <DifficultyBadge value={lineup.difficulty} />}</span></div>
               <div className="flex justify-between gap-4 border-b border-white/8 pb-3"><span>Тип броска</span><span className="text-white">{formatThrowTypeRu(lineup.throwType)}</span></div>
               <div className="flex justify-between gap-4"><span>Статус</span><span className="text-emerald-200">{formatStatusRu(lineup.status)}</span></div>
             </div>
-            <h3 className="mt-6 text-lg font-semibold text-white">Теги</h3>
+            <h3 className="mt-6 text-lg font-black text-white">Теги</h3>
             <div className="mt-5 flex flex-wrap gap-2">
               {lineup.tags.length ? lineup.tags.map((tag) => <Badge key={tag}>#{tag}</Badge>) : <span className="text-sm text-slate-400">Теги не добавлены.</span>}
             </div>
           </div>
 
-          <div className="glass-card rounded-[2rem] p-6">
-            <h2 className="text-2xl font-semibold text-white">Источник</h2>
+          <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
+            <h2 className="text-2xl font-black text-white">Источник</h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
               {lineup.sourceName ? `Материал импортирован из источника ${lineup.sourceName}.` : "Запись добавлена вручную через CyberLineup SR."}
             </p>
             {lineup.sourceUrl ? (
-              <a href={lineup.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm text-cyan-200">
+              <a href={lineup.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40">
                 <ExternalLink className="h-4 w-4" />
                 Открыть оригинал
               </a>
             ) : null}
           </div>
-        </div>
+        </aside>
       </section>
-
-      {galleryImages.length ? (
-        <section className="space-y-5">
-          <h2 className="text-2xl font-semibold text-white">Фотографии раскида</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {galleryImages.map((image) => (
-              <a key={image.url} href={image.sourceUrl} target="_blank" rel="noreferrer" className="glass-card overflow-hidden rounded-[2rem] transition hover:-translate-y-1 hover:border-cyan-400/25">
-                <ImportedImage src={image.localUrl ?? image.url} alt={image.alt} className="aspect-video w-full" imgClassName="transition duration-500 hover:scale-[1.03]" />
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section className="space-y-5">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-semibold text-white">Похожие раскиды</h2>
+          <h2 className="text-3xl font-black text-white">Похожие раскиды</h2>
           <p className="text-sm text-slate-400">
             {displayMapName} • {formatAreaRu(lineup.area)}
           </p>
@@ -290,7 +288,7 @@ export default async function LineupPage({ params }: { params: { slug: string } 
             ))}
           </div>
         ) : (
-          <div className="glass-card rounded-[2rem] p-8 text-center text-sm text-slate-400">Похожих опубликованных раскидов по этой карте и зоне пока нет.</div>
+          <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-8 text-center text-sm text-slate-400">Похожих опубликованных раскидов по этой карте и зоне пока нет.</div>
         )}
       </section>
     </div>

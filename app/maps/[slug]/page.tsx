@@ -91,25 +91,25 @@ export default async function MapPage({
 
   return (
     <div className="space-y-8 pb-16">
-      <section className={`glass-card overflow-hidden rounded-[2.5rem] bg-gradient-to-br ${MAP_HERO_ACCENTS[map.slug] ?? "from-cyan-500/20 to-transparent"} p-8`}>
-        <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
+      <section className={`tactical-panel bg-gradient-to-br ${MAP_HERO_ACCENTS[map.slug] ?? "from-cyan-500/20 to-transparent"} p-6 sm:p-8`}>
+        <div className="relative grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Карта</div>
-            <h1 className="mt-2 text-5xl font-semibold text-white">{displayMapName}</h1>
+            <div className="tactical-label text-orange-200">Карта</div>
+            <h1 className="mt-2 text-5xl font-black leading-none text-white">{displayMapName}</h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">{formatMapDescriptionRu(map.slug, map.description)}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {["smoke", "flash", "molotov", "he", "oneway"].map((type) => (
-              <div key={type} className="rounded-3xl border border-white/10 bg-slate-950/35 p-4">
-                <div className="text-xs uppercase tracking-[0.24em] text-slate-500">{formatUtilityTypeRu(type)}</div>
-                <div className="mt-2 text-3xl font-semibold text-white">{counterMap[type] ?? 0}</div>
+              <div key={type} className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{formatUtilityTypeRu(type)}</div>
+                <div className="mt-2 text-3xl font-black text-white">{counterMap[type] ?? 0}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <form className="glass-card grid gap-4 rounded-[2rem] p-5 lg:grid-cols-6" method="get">
+      <form className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.28)] lg:grid-cols-6" method="get">
         <label className="space-y-2 text-sm">
           <span className="text-slate-400">Тип гранаты</span>
           <select name="utilityType" defaultValue={searchParams?.utilityType ?? ""} className="admin-input">
@@ -146,11 +146,11 @@ export default async function MapPage({
             <option value="unknown">{formatDifficultyRu("unknown")}</option>
           </select>
         </label>
-        <label className="mt-8 flex items-center gap-3 text-sm text-slate-300">
-          <input type="checkbox" name="verifiedOnly" value="true" defaultChecked={parseBoolean(searchParams?.verifiedOnly)} className="h-5 w-5 rounded border-white/20 bg-slate-900" />
+        <label className="flex items-end gap-3 pb-1 text-sm font-semibold text-slate-300 lg:pt-8">
+          <input type="checkbox" name="verifiedOnly" value="true" defaultChecked={parseBoolean(searchParams?.verifiedOnly)} className="h-5 w-5 rounded border-white/20 bg-[#05070d] accent-orange-500" />
           Только проверенные
         </label>
-        <div className="mt-6 flex items-end">
+        <div className="flex items-end lg:pt-6">
           <button type="submit" className="admin-button w-full">
             Применить
           </button>

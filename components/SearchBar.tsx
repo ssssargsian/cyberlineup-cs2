@@ -28,8 +28,8 @@ export function SearchBar({
     <motion.form
       layout
       className={cn(
-        "glass-card flex w-full flex-col gap-3 p-3 sm:flex-row sm:items-center",
-        large ? "rounded-[2rem] p-4 sm:p-5" : "rounded-3xl",
+        "flex w-full flex-col gap-3 rounded-2xl border border-white/10 bg-[#0b0f18]/95 p-3 shadow-[0_22px_80px_rgba(0,0,0,0.32)] ring-1 ring-orange-400/5 sm:flex-row sm:items-center",
+        large ? "p-3 sm:p-4" : "",
         className
       )}
       onSubmit={(event) => {
@@ -41,8 +41,8 @@ export function SearchBar({
         router.push(params.toString() ? `${actionPath}?${params.toString()}` : actionPath);
       }}
     >
-      <div className="flex h-14 items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/60 px-4 sm:h-16 sm:flex-1">
-        <Search className="h-5 w-5 text-cyan-300" />
+      <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-[#05070d]/80 px-4 transition focus-within:border-orange-400/45 sm:h-16 sm:flex-1">
+        <Search className="h-5 w-5 text-orange-300" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -52,7 +52,7 @@ export function SearchBar({
       </div>
       <button
         type="submit"
-        className="inline-flex h-14 items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 px-6 text-sm font-semibold uppercase tracking-[0.24em] text-slate-950 transition hover:opacity-90 sm:h-16"
+        className="inline-flex h-14 items-center justify-center rounded-xl border border-orange-400/40 bg-gradient-to-r from-[#ff5500] via-[#f97316] to-[#f59e0b] px-6 text-sm font-black text-white shadow-[0_0_32px_rgba(255,85,0,0.24)] transition hover:border-orange-300/60 hover:shadow-[0_0_42px_rgba(255,85,0,0.36)] sm:h-16"
       >
         {buttonLabel}
       </button>

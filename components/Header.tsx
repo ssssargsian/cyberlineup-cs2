@@ -17,11 +17,11 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 mb-8 backdrop-blur-xl">
-      <div className="rounded-[1.75rem] border border-white/10 bg-[rgba(7,10,18,0.82)] px-4 py-3 shadow-[0_20px_80px_rgba(4,8,20,0.42)] ring-1 ring-cyan-400/5 sm:px-5">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <header className="sticky top-0 z-40 mb-8 pt-1 backdrop-blur-xl">
+      <div className="rounded-2xl border border-white/10 bg-[#0b0f18]/95 px-3 py-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] ring-1 ring-orange-400/5 sm:px-4">
+        <div className="flex items-center justify-between gap-3">
           <Logo />
-          <nav className="flex flex-wrap gap-2">
+          <nav className="flex shrink-0 gap-1 overflow-x-auto rounded-xl border border-white/8 bg-black/25 p-1">
             {links.map((link) => {
               const Icon = link.icon;
               const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
@@ -31,14 +31,14 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition",
+                    "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm",
                     isActive
-                      ? "border-cyan-400/35 bg-cyan-400/12 text-white shadow-[0_0_24px_rgba(34,211,238,0.12)]"
-                      : "border-white/10 bg-slate-950/35 text-slate-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-white"
+                      ? "border-orange-400/45 bg-orange-500/15 text-white shadow-[0_0_24px_rgba(255,85,0,0.16)]"
+                      : "border-transparent text-slate-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-white"
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {link.label}
+                  <span className="hidden sm:inline">{link.label}</span>
                 </Link>
               );
             })}

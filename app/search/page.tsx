@@ -6,6 +6,7 @@ import { LineupCard } from "@/components/LineupCard";
 import { SearchBar } from "@/components/SearchBar";
 import { SearchIntentPreview } from "@/components/SearchIntentPreview";
 import { prisma } from "@/lib/prisma";
+import { ButtonLink } from "@/src/components/ui/Button";
 import { formatDifficultyRu, formatMapNameRu, formatSideRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
 import { searchLineups } from "@/src/lib/search";
 
@@ -63,18 +64,20 @@ export default async function SearchPage({
 
   return (
     <div className="space-y-8 pb-16">
-      <section className="space-y-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Поиск</div>
-          <h1 className="section-title mt-2">Релевантный поиск по опубликованной базе</h1>
-          <p className="section-copy mt-3">Сервис понимает карту, тип гранаты, зону и сторону. Черновики и записи на модерации публично не попадают в выдачу.</p>
+      <section className="tactical-panel p-6 sm:p-8">
+        <div className="relative space-y-5">
+          <div>
+            <div className="tactical-label text-orange-200">Поиск</div>
+            <h1 className="mt-2 text-4xl font-black leading-tight text-white sm:text-5xl">Результаты поиска</h1>
+            <p className="section-copy mt-3">Сервис понимает карту, тип гранаты, зону и сторону. Черновики и записи на модерации публично не попадают в выдачу.</p>
+          </div>
+          <SearchBar initialValue={search.query} actionPath="/search" buttonLabel="Найти" />
         </div>
-        <SearchBar initialValue={search.query} actionPath="/search" />
       </section>
 
       <SearchIntentPreview intent={search.intent} />
 
-      <form className="glass-card grid gap-4 rounded-[2rem] p-5 lg:grid-cols-7" method="get">
+      <form className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.28)] lg:grid-cols-7" method="get">
         <input type="hidden" name="q" value={search.query} />
         <label className="space-y-2 text-sm">
           <span className="text-slate-400">Карта</span>
@@ -123,18 +126,18 @@ export default async function SearchPage({
             <option value="unknown">{formatDifficultyRu("unknown")}</option>
           </select>
         </label>
-        <label className="mt-8 flex items-center gap-3 text-sm text-slate-300">
-          <input type="checkbox" name="verifiedOnly" value="true" defaultChecked={parseBoolean(searchParams?.verifiedOnly)} className="h-5 w-5 rounded border-white/20 bg-slate-900" />
+        <label className="flex items-end gap-3 pb-1 text-sm font-semibold text-slate-300 lg:pt-8">
+          <input type="checkbox" name="verifiedOnly" value="true" defaultChecked={parseBoolean(searchParams?.verifiedOnly)} className="h-5 w-5 rounded border-white/20 bg-[#05070d] accent-orange-500" />
           Только проверенные
         </label>
-        <div className="mt-6 flex items-end">
+        <div className="flex items-end lg:pt-6">
           <button type="submit" className="admin-button w-full">
             Применить
           </button>
         </div>
       </form>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-slate-400">
           Запрос: <span className="text-white">{search.query || "пустой"}</span>
           {search.normalizedQuery ? <> • нормализовано: <span className="text-cyan-200">{search.normalizedQuery}</span></> : null}
@@ -150,8 +153,9 @@ export default async function SearchPage({
         </div>
       ) : (
         <EmptyState
-          title="В базе пока нет такого опубликованного раскида"
+          title="Ничего не нашли по этому запросу"
           description="Попробуйте изменить формулировку запроса, ослабить фильтры или опубликовать нужный импортированный раскид через админку."
+          action={<ButtonLink href="/assistant">Открыть ассистента</ButtonLink>}
         />
       )}
 

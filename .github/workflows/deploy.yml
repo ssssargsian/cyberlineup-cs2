@@ -1,0 +1,23 @@
+name: Deploy CyberLineup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to CentOS 7 server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CYBERLINEUP_HOST }}
+          username: ${{ secrets.CYBERLINEUP_USER }}
+          key: ${{ secrets.CYBERLINEUP_SSH_KEY }}
+          port: ${{ secrets.CYBERLINEUP_SSH_PORT }}
+          script_stop: true
+          script: |
+            sudo RUN_IMPORT=false /opt/cyberlineup/deploy.sh

@@ -47,6 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    env:
+      RUN_MIGRATIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.run_migrations || 'true' }}
+      RUN_SYNC: ${{ github.event_name == 'workflow_dispatch' && inputs.run_sync || 'false' }}
+      RUN_PUBLISH: ${{ github.event_name == 'workflow_dispatch' && inputs.run_publish || 'false' }}
+
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -57,22 +62,13 @@ jobs:
           port: 22
           script_stop: true
           command_timeout: 30m
+          envs: RUN_MIGRATIONS,RUN_SYNC,RUN_PUBLISH
           script: |
             set -Eeuo pipefail
 
             echo "=== Connected ==="
             whoami
             hostname
-
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              RUN_MIGRATIONS="${{ inputs.run_migrations }}"
-              RUN_SYNC="${{ inputs.run_sync }}"
-              RUN_PUBLISH="${{ inputs.run_publish }}"
-            else
-              RUN_MIGRATIONS="true"
-              RUN_SYNC="false"
-              RUN_PUBLISH="false"
-            fi
 
             echo "RUN_MIGRATIONS=$RUN_MIGRATIONS"
             echo "RUN_SYNC=$RUN_SYNC"

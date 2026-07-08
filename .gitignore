@@ -86,3 +86,10 @@ temp/
 
 # local scripts output
 *.local.json
+
+.env
+.env.production
+.env.local
+.env.*.local
+
+docker-compose.centos7.yml

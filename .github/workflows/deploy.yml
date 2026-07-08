@@ -64,13 +64,6 @@ jobs:
             whoami
             hostname
 
-            echo "=== Check deploy script ==="
-            ls -la /opt/cyberlineup/deploy.sh
-
-            echo "=== Check app git as cyberlineup ==="
-            sudo -u cyberlineup bash -lc 'cd /var/www/cyberlineup-sr && git status --short'
-            sudo -u cyberlineup bash -lc 'cd /var/www/cyberlineup-sr && git remote -v'
-
             if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
               RUN_MIGRATIONS="${{ inputs.run_migrations }}"
               RUN_SYNC="${{ inputs.run_sync }}"

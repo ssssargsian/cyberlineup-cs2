@@ -92,4 +92,4 @@ temp/
 .env.local
 .env.*.local
 
-docker-compose.centos7.yml
+#docker-compose.centos7.yml

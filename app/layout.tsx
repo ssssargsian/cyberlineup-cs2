@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
-import { APP_NAME, APP_SUBTITLE } from "@/src/lib/catalog";
+import { APP_NAME } from "@/src/lib/catalog";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: APP_SUBTITLE
+  description: "Раскидки CS2 за секунды",
+  icons: {
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" }
+    ],
+    shortcut: "/logo.svg",
+    apple: "/logo.svg"
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

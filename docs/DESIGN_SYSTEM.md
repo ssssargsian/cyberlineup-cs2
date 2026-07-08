@@ -1,9 +1,9 @@
-# CyberLineup SR — Design System
+# CyberLineup — Design System
 
 UI-задачи также должны соблюдать `docs/skills/CS2_UI_SKILL.md`.
 
 ## Visual concept
-CyberLineup SR выглядит как премиальный CS2-инструмент, а не как обычный тёмный шаблон.
+CyberLineup выглядит как чистый, современный CS2-инструмент, а не как перегруженный тёмный шаблон.
 
 Ощущение:
 - CS2 match stats
@@ -12,7 +12,7 @@ CyberLineup SR выглядит как премиальный CS2-инструм
 - CYBERSHOKE server browser
 - Apple/Linear аккуратность
 
-Не копировать чужой дизайн напрямую. Стиль: Dark Tactical Esports, плотные игровые dashboard-панели, крупные превью, оранжевые FACEIT-like CTA, cyan/tooling accents и быстрый визуальный разбор `тип гранаты → карта → откуда → куда`.
+Не копировать чужой дизайн напрямую. Стиль: Dark Minimal Gaming SaaS. Нужны понятный поиск, читаемая типографика, мягкие тёмные панели, умеренные orange/cyan accents и быстрый визуальный разбор `тип гранаты → карта → откуда → куда`.
 
 ## Colors
 Background:
@@ -23,9 +23,9 @@ Background:
 - tactical blue `#0A1420`
 
 Panels:
-- solid tactical panels: `#0B0F18` at 90-95%
+- solid dark panels: `#0B0F18` at 80-95%
 - inner blocks: `rgba(255,255,255,0.04)`
-- black HUD panels: `rgba(0,0,0,0.25-0.35)`
+- black HUD panels: `rgba(0,0,0,0.18-0.28)`
 
 Borders:
 - default `rgba(255,255,255,0.08)`
@@ -52,9 +52,11 @@ Utility colors:
 
 ## Typography
 - Интерфейс на русском.
-- Заголовки жирные, плотные, как в esports UI.
+- Основной текст должен быть максимально читаемым: `Inter`, `Manrope`, `system-ui`.
+- Заголовки жирные, но не чрезмерно декоративные.
 - Uppercase использовать только для коротких labels, не для основного текста.
-- Меньше серого текста: ключевые данные должны иметь высокий контраст.
+- Letter-spacing использовать умеренно, особенно в бренде.
+- Меньше серого текста: ключевые данные должны иметь нормальный контраст.
 - Главное действие должно быть визуально очевидным.
 
 ## Layout
@@ -64,13 +66,14 @@ Utility colors:
 - grid cards;
 - sticky/clear navigation if needed;
 - spacing consistent;
+- меньше декоративных рамок и glow, больше воздуха;
 - изображения на mobile во всю ширину, без поломки карточек.
 
 ## Cards
 - `rounded-xl`, `rounded-2xl` или `rounded-[1.5rem]`;
-- меньше стекла, больше solid tactical panels;
+- меньше стекла, больше спокойных solid panels;
 - soft border;
-- subtle orange/cyan/violet glow;
+- subtle orange/cyan glow;
 - hover lift;
 - preview image сверху;
 - image zoom около `1.03` on hover;
@@ -80,8 +83,8 @@ Utility colors:
 
 ## Buttons
 Primary:
-- orange → amber gradient, обычно `#FF5500 → #F97316 → #F59E0B`;
-- glow on hover;
+- orange CTA, обычно `#FF5500` с мягким hover в `#F97316`;
+- glow умеренный;
 - `rounded-xl`;
 - clear CTA.
 
@@ -118,12 +121,13 @@ HE:
 
 ## Pages
 Главная:
-- hero `Раскиды CS2 за секунды`;
-- подзаголовок про смоки, флешки, молотовы и HE;
-- большой поиск с orange primary CTA;
-- примеры запросов;
-- dashboard stats: всего раскидов, карт, смоков, флешек, молотовых;
-- карты как быстрые входы в базу.
+- header содержит logo + `CyberLineup`; не дублировать логотип отдельной карточкой в hero;
+- hero `Раскидки CS2 за секунды`;
+- короткий подзаголовок про смоки, флешки, молотовы и HE;
+- большой поиск как главное действие;
+- компактные популярные запросы;
+- stats сразу ниже hero: всего раскидок, карт, смоков, флешек, молотовых, HE;
+- карты ниже статистики как быстрые входы в базу.
 
 Search:
 - фильтры сверху на mobile, сеткой на desktop;
@@ -188,6 +192,8 @@ Admin:
 - кислотный neon без меры;
 - разные стили на разных страницах;
 - перегруженные карточки;
+- перегруженный hero;
+- логотип отдельной декоративной карточкой в hero;
 - отсутствие mobile адаптации;
 - копирование чужого сайта 1 в 1.
 

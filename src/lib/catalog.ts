@@ -1,11 +1,11 @@
 import { Difficulty, LineupStatus, Side, UtilityType } from "@prisma/client";
 
 export const APP_NAME = "CyberLineup";
-export const APP_TAGLINE = "ИИ-помощник по раскидам CS2";
-export const APP_SUBTITLE = "Премиальный сервис для поиска, обучения и модерации раскидов гранат в Counter-Strike 2.";
+export const APP_TAGLINE = "ИИ-помощник по раскидкам CS2";
+export const APP_SUBTITLE = "Раскидки CS2 за секунды: поиск смоков, флешек, молотовых и HE по картам.";
 
 export const SEARCH_PLACEHOLDER =
-  "Например: смок Б Dust 2, флеш мид Mirage, молик car Inferno";
+  "Например: смок B Dust 2, флеш мид Mirage";
 
 export const MAPS = [
   { name: "Dust 2", slug: "dust-2" },

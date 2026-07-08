@@ -62,10 +62,11 @@ CyberLineup — платформа поиска раскидов CS2 с импо
 - New import-generated slugs use Latin-only `safeLatinSlug()` with a short source hash.
 - Canonical Dust map is `Dust 2` with slug `dust-2`; `repair:maps` merges old `Dust II`/`dust-ii` duplicates.
 - Imported and remote images render through `ImportedImage`, so photos are visible immediately and fallback appears only on load error or empty `src`.
-- Public UI was redesigned toward Dark Tactical Esports: FACEIT-like orange CTA, solid tactical panels, denser cards, CS2-style dashboard stats and Russian-only public labels.
+- Public UI now uses a cleaner Dark Minimal Gaming SaaS direction: readable typography, restrained orange/cyan accents, softer panels, less decorative noise and Russian-only public labels.
 - Public brand is `CyberLineup` without `SR` and without `Sargsian Rafik`.
 - Header uses `public/logo.svg`, a compact tactical shield/crosshair/grenade mark, and switches to a burger dropdown on mobile.
-- Home page first screen starts with a practical `CyberLineup` brand row plus the main search form, then shows the hero headline and popular query shortcuts.
+- Home page first screen is compact and product-first: headline `Раскидки CS2 за секунды`, short explanation, main search form and compact popular query shortcuts. The logo stays in the header, not as a separate hero card.
+- Metadata explicitly sets `title: CyberLineup` and SVG icons through `/logo.svg` and `/icon.svg`.
 - Admin lineup lists now use server-side pagination with `page`, `pageSize`, `q`, `status`, `map`, and `utilityType` query params.
 - `/admin/imports` pending-review list also uses server-side pagination.
 - Admin tables use an internal horizontal scroll wrapper on mobile instead of forcing page-wide overflow.
@@ -114,4 +115,4 @@ CyberLineup — платформа поиска раскидов CS2 с импо
 - UI должен быть на русском.
 - Публичный UI должен использовать бренд `CyberLineup`, не `CyberLineup SR`; публичные авторские подписи вроде `Sargsian Rafik` запрещены.
 - Дизайн должен соответствовать `docs/DESIGN_SYSTEM.md`.
-- Новые публичные UI-правки должны сохранять Dark Tactical Esports стиль: solid panels, orange primary CTA, cyan secondary accents and visible-by-default images.
+- Новые публичные UI-правки должны сохранять чистый Dark Minimal Gaming SaaS стиль: читаемая типографика, меньше декоративного шума, orange primary CTA, cyan secondary accents and visible-by-default images.

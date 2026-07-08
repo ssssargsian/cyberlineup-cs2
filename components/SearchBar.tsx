@@ -13,13 +13,15 @@ export function SearchBar({
   actionPath = "/search",
   className,
   large = false,
-  buttonLabel = "Найти"
+  buttonLabel = "Найти",
+  placeholder = SEARCH_PLACEHOLDER
 }: {
   initialValue?: string;
   actionPath?: string;
   className?: string;
   large?: boolean;
   buttonLabel?: string;
+  placeholder?: string;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState(initialValue);
@@ -47,7 +49,7 @@ export function SearchBar({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           className="h-full w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500 sm:text-base"
-          placeholder={SEARCH_PLACEHOLDER}
+          placeholder={placeholder}
         />
       </div>
       <button

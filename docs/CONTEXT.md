@@ -1,4 +1,4 @@
-# CyberLineup SR — Context
+# CyberLineup — Context
 
 ## Project goal
 CyberLineup — платформа поиска раскидов CS2 с импортом внешней базы, поиском, страницами раскидов и ИИ-ассистентом.
@@ -64,7 +64,8 @@ CyberLineup — платформа поиска раскидов CS2 с импо
 - Imported and remote images render through `ImportedImage`, so photos are visible immediately and fallback appears only on load error or empty `src`.
 - Public UI was redesigned toward Dark Tactical Esports: FACEIT-like orange CTA, solid tactical panels, denser cards, CS2-style dashboard stats and Russian-only public labels.
 - Public brand is `CyberLineup` without `SR` and without `Sargsian Rafik`.
-- Header uses `public/logo.svg`, a custom tactical `C`/trajectory/crosshair mark, and switches to a burger dropdown on mobile.
+- Header uses `public/logo.svg`, a compact tactical shield/crosshair/grenade mark, and switches to a burger dropdown on mobile.
+- Home page first screen starts with a practical `CyberLineup` brand row plus the main search form, then shows the hero headline and popular query shortcuts.
 - Admin lineup lists now use server-side pagination with `page`, `pageSize`, `q`, `status`, `map`, and `utilityType` query params.
 - `/admin/imports` pending-review list also uses server-side pagination.
 - Admin tables use an internal horizontal scroll wrapper on mobile instead of forcing page-wide overflow.
@@ -111,6 +112,6 @@ CyberLineup — платформа поиска раскидов CS2 с импо
 - Slugs должны быть латиницей: только `a-z`, `0-9`, `-`.
 - Не переводить `sourceUrl` и `slug`.
 - UI должен быть на русском.
-- Публичный UI должен использовать бренд `CyberLineup`, не `CyberLineup SR`.
+- Публичный UI должен использовать бренд `CyberLineup`, не `CyberLineup SR`; публичные авторские подписи вроде `Sargsian Rafik` запрещены.
 - Дизайн должен соответствовать `docs/DESIGN_SYSTEM.md`.
 - Новые публичные UI-правки должны сохранять Dark Tactical Esports стиль: solid panels, orange primary CTA, cyan secondary accents and visible-by-default images.

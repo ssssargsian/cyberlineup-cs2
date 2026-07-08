@@ -1,7 +1,8 @@
-import { ArrowRight, Bot, CheckCheck, Crosshair, DatabaseZap, Flame, MapPinned, Search, Sparkles, Video, Zap } from "lucide-react";
+import { ArrowRight, CheckCheck, Crosshair, DatabaseZap, Flame, MapPinned, Search, Sparkles, Video, Zap } from "lucide-react";
 import Link from "next/link";
 
 import { LineupCard } from "@/components/LineupCard";
+import { Logo } from "@/components/Logo";
 import { MapCard } from "@/components/MapCard";
 import { SearchBar } from "@/components/SearchBar";
 import { prisma } from "@/lib/prisma";
@@ -95,52 +96,49 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-12 pb-16">
-      <section className="tactical-panel px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
-        <div className="relative grid gap-10 lg:grid-cols-[1.12fr,0.88fr] lg:items-center">
-          <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-orange-200">
-              <Bot className="h-3.5 w-3.5" />
-              ИИ-помощник по раскидам CS2
+      <section className="tactical-panel px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
+        <div className="relative space-y-7">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.24)] sm:px-5">
+              <Logo />
             </div>
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.9] text-white sm:text-6xl lg:text-7xl">
-              Раскиды CS2 за секунды
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-              Смоки, флешки, молотовы и HE по картам. Ищите обычным языком и открывайте раскиды с фото шагов.
-            </p>
+            <SearchBar
+              actionPath="/search"
+              buttonLabel="Найти раскид"
+              placeholder="Например: смок B Dust 2, флеш мид Mirage"
+              className="lg:max-w-3xl"
+            />
+          </div>
 
-            <div className="mt-8">
-              <SearchBar actionPath="/search" large buttonLabel="Найти раскид" />
+          <div className="grid gap-7 lg:grid-cols-[1.08fr,0.92fr] lg:items-end">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-orange-200">
+                ИИ-помощник по раскидам CS2
+              </div>
+              <h1 className="max-w-4xl text-4xl font-black leading-[0.95] text-white sm:text-5xl lg:text-6xl">
+                Раскиды CS2 за секунды
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+                Смоки, флешки, молотовы и HE по картам. Ищите обычным языком и открывайте раскиды с фото шагов.
+              </p>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {["смок б даст", "молик банан инферно", "flash mid mirage", "smoke ct spawn mid inferno"].map((query) => (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {POPULAR_QUERIES.slice(0, 4).map((query, index) => (
                 <Link
                   key={query}
                   href={`/search?q=${encodeURIComponent(query)}`}
-                  className="rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-orange-400/30 hover:bg-orange-500/10 hover:text-white"
+                  className="group flex min-h-[5.5rem] flex-col justify-between rounded-2xl border border-white/10 bg-black/25 p-4 transition hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-cyan-400/10"
                 >
-                  {query}
+                  <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-slate-500">Запрос {String(index + 1).padStart(2, "0")}</div>
+                  <div className="text-base font-black text-white">{query}</div>
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold text-cyan-200">
+                    Открыть поиск
+                    <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                  </div>
                 </Link>
               ))}
             </div>
-          </div>
-
-          <div className="grid gap-4">
-            {POPULAR_QUERIES.slice(0, 4).map((query, index) => (
-              <Link
-                key={query}
-                href={`/search?q=${encodeURIComponent(query)}`}
-                className="group flex min-h-[7.5rem] flex-col justify-between rounded-2xl border border-white/10 bg-black/25 p-4 transition hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-cyan-400/10"
-              >
-                <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Популярный запрос {String(index + 1).padStart(2, "0")}</div>
-                <div className="text-lg font-black text-white">{query}</div>
-                <div className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200">
-                  Открыть поиск
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

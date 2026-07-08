@@ -79,7 +79,7 @@ async function fetchText(url: string, attempt = 0): Promise<string> {
   try {
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "CyberLineupSRBot/1.0 (+https://localhost)",
+        "User-Agent": "CyberLineupBot/1.0 (+https://localhost)",
         Accept: "text/html,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8"
       },

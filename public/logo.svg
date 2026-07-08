@@ -1,16 +1,32 @@
 <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CyberLineup">
   <rect width="96" height="96" rx="22" fill="#05070D"/>
-  <path d="M71.5 24.5C65.7 18.9 57.5 15.5 48.4 15.5C30.2 15.5 15.5 30.2 15.5 48.4C15.5 66.6 30.2 81.3 48.4 81.3C57.8 81.3 66.3 77.4 72.2 71.1" stroke="url(#cmark)" stroke-width="10" stroke-linecap="round"/>
-  <path d="M31 61C40.5 42.2 54.1 32.3 72 31" stroke="#22D3EE" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 8"/>
-  <path d="M49 47H79" stroke="#FF5500" stroke-width="4" stroke-linecap="round"/>
-  <path d="M64 32V62" stroke="#FF5500" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="64" cy="47" r="10" fill="#0B0F18" stroke="#F59E0B" stroke-width="4"/>
-  <circle cx="64" cy="47" r="3.5" fill="#22D3EE"/>
-  <path d="M24 24L32 32M24 72L32 64" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+  <rect x="7" y="7" width="82" height="82" rx="18" fill="url(#panel)" stroke="url(#frame)" stroke-width="2"/>
+  <path d="M48 16L73 26V45C73 61.5 63.4 75.3 48 81C32.6 75.3 23 61.5 23 45V26L48 16Z" fill="#0B0F18" stroke="#263244" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M48 24L64 30.3V43.2C64 54.8 58.2 64.3 48 69.3C37.8 64.3 32 54.8 32 43.2V30.3L48 24Z" fill="url(#shieldInner)" stroke="url(#shieldStroke)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M35.5 58.5C43.2 45.4 51.9 38.1 63.2 35.2" stroke="#22D3EE" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="1 7"/>
+  <path d="M48 33.5V61.5" stroke="#FF5500" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M34 47.5H62" stroke="#FF5500" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="48" cy="47.5" r="9.5" fill="#101827" stroke="#F59E0B" stroke-width="3.4"/>
+  <circle cx="48" cy="47.5" r="3.2" fill="#22D3EE"/>
+  <path d="M67.5 24.5L76 20.5M72.5 31L81.5 31.5" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M19 69L27.5 64.5M19.5 27.5L28 32" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
   <defs>
-    <linearGradient id="cmark" x1="18" y1="18" x2="76" y2="79" gradientUnits="userSpaceOnUse">
+    <linearGradient id="panel" x1="12" y1="10" x2="84" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101827"/>
+      <stop offset="0.55" stop-color="#080B14"/>
+      <stop offset="1" stop-color="#130B08"/>
+    </linearGradient>
+    <linearGradient id="frame" x1="10" y1="8" x2="88" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE" stop-opacity="0.85"/>
+      <stop offset="0.52" stop-color="#334155" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FF5500" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="shieldInner" x1="33" y1="25" x2="62" y2="68" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#151B28"/>
+      <stop offset="1" stop-color="#07111E"/>
+    </linearGradient>
+    <linearGradient id="shieldStroke" x1="32" y1="25" x2="66" y2="68" gradientUnits="userSpaceOnUse">
       <stop stop-color="#22D3EE"/>
-      <stop offset="0.48" stop-color="#3B82F6"/>
       <stop offset="1" stop-color="#FF5500"/>
     </linearGradient>
   </defs>

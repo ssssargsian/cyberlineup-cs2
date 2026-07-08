@@ -20,6 +20,7 @@ export function ImportedImage({
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const hasPositionClass = /\b(absolute|relative|fixed|sticky)\b/.test(className ?? "");
 
   if (!src || failed) {
     return (
@@ -36,7 +37,7 @@ export function ImportedImage({
   }
 
   return (
-    <div className={cn("relative overflow-hidden bg-slate-950/70", className)}>
+    <div className={cn(!hasPositionClass && "relative", "overflow-hidden bg-slate-950/70", className)}>
       {!loaded ? (
         <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,rgba(15,23,42,0.92),rgba(34,211,238,0.12),rgba(15,23,42,0.92))]" />
       ) : null}
@@ -47,7 +48,7 @@ export function ImportedImage({
         decoding="async"
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
-        className={cn("relative h-full w-full object-cover", imgClassName)}
+        className={cn("absolute inset-0 block h-full w-full object-cover", imgClassName)}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { ImportSourceType, LineupStatus } from "@prisma/client";
+import { ImportSourceType, LineupStatus, Prisma } from "@prisma/client";
 import Link from "next/link";
 
 import {
@@ -17,6 +17,7 @@ import { AdminTable } from "@/components/AdminTable";
 import { ImportJobStatus } from "@/components/ImportJobStatus";
 import { isAdminAuthenticated } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { AdminPagination } from "@/src/components/admin/AdminPagination";
 import { formatLineupTitleRu, formatStatusRu } from "@/src/lib/i18n/lineupDisplay";
 
 export const dynamic = "force-dynamic";
@@ -25,10 +26,28 @@ function countJsonArray(value: unknown) {
   return Array.isArray(value) ? value.length : 0;
 }
 
+type AdminImportsSearchParams = {
+  error?: string;
+  page?: string;
+  pageSize?: string;
+};
+
+const pageSizeOptions = [25, 50, 100];
+
+function parsePositiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parsePageSize(value: string | undefined) {
+  const parsed = parsePositiveInt(value, 25);
+  return pageSizeOptions.includes(parsed) ? parsed : 25;
+}
+
 export default async function AdminImportsPage({
   searchParams
 }: {
-  searchParams?: { error?: string };
+  searchParams?: AdminImportsSearchParams;
 }) {
   const isAuthenticated = isAdminAuthenticated();
 
@@ -36,7 +55,7 @@ export default async function AdminImportsPage({
     return (
       <div className="glass-card mx-auto max-w-2xl rounded-[2rem] p-10 text-center">
         <h1 className="text-3xl font-semibold text-white">ADMIN_PASSWORD не настроен</h1>
-        <p className="mt-4 text-slate-400">Добавьте переменную окружения, чтобы открыть админку импортов CyberLineup SR.</p>
+        <p className="mt-4 text-slate-400">Добавьте переменную окружения, чтобы открыть админку импортов CyberLineup.</p>
       </div>
     );
   }
@@ -47,7 +66,7 @@ export default async function AdminImportsPage({
         <form action={loginAdminAction} className="glass-card space-y-5 rounded-[2rem] p-8">
           <div>
             <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Доступ администратора</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Импорт CyberLineup SR</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-white">Импорт CyberLineup</h1>
             <p className="mt-3 text-sm text-slate-400">Пароль даёт доступ к экспорту JSON, импорту в базу и публикации pending-review раскидов.</p>
           </div>
           <label className="space-y-2 text-sm">
@@ -63,7 +82,11 @@ export default async function AdminImportsPage({
     );
   }
 
-  const [sources, jobs, pendingLineups] = await Promise.all([
+  const page = parsePositiveInt(searchParams?.page, 1);
+  const pageSize = parsePageSize(searchParams?.pageSize);
+  const pendingWhere = { status: { in: [LineupStatus.draft, LineupStatus.pending_review] } } satisfies Prisma.LineupWhereInput;
+
+  const [sources, jobs, pendingLineups, pendingTotal] = await Promise.all([
     prisma.importSource.findMany({
       where: { type: ImportSourceType.website },
       orderBy: { updatedAt: "desc" }
@@ -74,15 +97,17 @@ export default async function AdminImportsPage({
       take: 20
     }),
     prisma.lineup.findMany({
-      where: { status: { in: [LineupStatus.draft, LineupStatus.pending_review] } },
+      where: pendingWhere,
       include: { map: true },
       orderBy: [{ updatedAt: "desc" }],
-      take: 50
-    })
+      skip: (page - 1) * pageSize,
+      take: pageSize
+    }),
+    prisma.lineup.count({ where: pendingWhere })
   ]);
 
   return (
-    <div className="grid gap-8 pb-16 lg:grid-cols-[18rem,1fr]">
+    <div className="grid min-w-0 gap-8 pb-16 lg:grid-cols-[18rem,minmax(0,1fr)]">
       <AdminSidebar />
 
       <div className="space-y-8">
@@ -223,6 +248,13 @@ export default async function AdminImportsPage({
               </tr>
             ))}
           </AdminTable>
+          <AdminPagination
+            page={page}
+            pageSize={pageSize}
+            total={pendingTotal}
+            basePath="/admin/imports"
+            searchParams={{ ...(searchParams ?? {}) }}
+          />
         </section>
       </div>
     </div>

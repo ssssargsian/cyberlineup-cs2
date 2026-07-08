@@ -1,4 +1,4 @@
-import { ImportSourceType, LineupStatus } from "@prisma/client";
+import { ImportSourceType, LineupStatus, Prisma, UtilityType } from "@prisma/client";
 import Link from "next/link";
 
 import {
@@ -18,14 +18,45 @@ import { AdminTable } from "@/components/AdminTable";
 import { ImportJobStatus } from "@/components/ImportJobStatus";
 import { isAdminAuthenticated } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { AdminPagination } from "@/src/components/admin/AdminPagination";
 import { formatAreaRu, formatLineupTitleRu, formatStatusRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
 
 export const dynamic = "force-dynamic";
 
+type AdminSearchParams = {
+  error?: string;
+  page?: string;
+  pageSize?: string;
+  status?: string;
+  map?: string;
+  utilityType?: string;
+  q?: string;
+};
+
+const pageSizeOptions = [25, 50, 100];
+
+function parsePositiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parsePageSize(value: string | undefined) {
+  const parsed = parsePositiveInt(value, 25);
+  return pageSizeOptions.includes(parsed) ? parsed : 25;
+}
+
+function isLineupStatus(value: string | undefined): value is LineupStatus {
+  return Boolean(value && Object.values(LineupStatus).includes(value as LineupStatus));
+}
+
+function isUtilityType(value: string | undefined): value is UtilityType {
+  return Boolean(value && Object.values(UtilityType).includes(value as UtilityType));
+}
+
 export default async function AdminPage({
   searchParams
 }: {
-  searchParams?: { error?: string };
+  searchParams?: AdminSearchParams;
 }) {
   const isAuthenticated = isAdminAuthenticated();
 
@@ -33,7 +64,7 @@ export default async function AdminPage({
     return (
       <div className="glass-card mx-auto max-w-2xl rounded-[2rem] p-10 text-center">
         <h1 className="text-3xl font-semibold text-white">ADMIN_PASSWORD не настроен</h1>
-        <p className="mt-4 text-slate-400">Добавьте переменную окружения, чтобы открыть модерационную админку CyberLineup SR.</p>
+        <p className="mt-4 text-slate-400">Добавьте переменную окружения, чтобы открыть модерационную админку CyberLineup.</p>
       </div>
     );
   }
@@ -44,7 +75,7 @@ export default async function AdminPage({
         <form action={loginAdminAction} className="glass-card space-y-5 rounded-[2rem] p-8">
           <div>
             <div className="text-xs uppercase tracking-[0.28em] text-cyan-300">Доступ администратора</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Админка CyberLineup SR</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-white">Админка CyberLineup</h1>
             <p className="mt-3 text-sm text-slate-400">Пароль даёт доступ к модерации импортов, CRUD по базе и запуску импорт-пайплайна.</p>
           </div>
           <label className="space-y-2 text-sm">
@@ -60,7 +91,30 @@ export default async function AdminPage({
     );
   }
 
-  const [maps, lineups, sources, jobs] = await Promise.all([
+  const page = parsePositiveInt(searchParams?.page, 1);
+  const pageSize = parsePageSize(searchParams?.pageSize);
+  const q = searchParams?.q?.trim() ?? "";
+  const status = isLineupStatus(searchParams?.status) ? searchParams.status : undefined;
+  const utilityType = isUtilityType(searchParams?.utilityType) ? searchParams.utilityType : undefined;
+  const mapSlug = searchParams?.map?.trim() || undefined;
+  const lineupWhere: Prisma.LineupWhereInput = {
+    ...(status ? { status } : {}),
+    ...(utilityType ? { utilityType } : {}),
+    ...(mapSlug ? { map: { slug: mapSlug } } : {}),
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { slug: { contains: q, mode: "insensitive" } },
+            { fromPosition: { contains: q, mode: "insensitive" } },
+            { targetPosition: { contains: q, mode: "insensitive" } },
+            { sourceName: { contains: q, mode: "insensitive" } }
+          ]
+        }
+      : {})
+  };
+
+  const [maps, lineups, lineupsTotal, totalLineups, publishedCount, pendingCount, drafts, sources, jobs] = await Promise.all([
     prisma.map.findMany({
       include: {
         _count: {
@@ -72,8 +126,21 @@ export default async function AdminPage({
       orderBy: { name: "asc" }
     }),
     prisma.lineup.findMany({
+      where: lineupWhere,
       include: { map: true },
-      orderBy: [{ updatedAt: "desc" }]
+      orderBy: [{ updatedAt: "desc" }],
+      skip: (page - 1) * pageSize,
+      take: pageSize
+    }),
+    prisma.lineup.count({ where: lineupWhere }),
+    prisma.lineup.count(),
+    prisma.lineup.count({ where: { status: LineupStatus.published } }),
+    prisma.lineup.count({ where: { status: { in: [LineupStatus.draft, LineupStatus.pending_review] } } }),
+    prisma.lineup.findMany({
+      where: { status: { in: [LineupStatus.draft, LineupStatus.pending_review] } },
+      include: { map: true },
+      orderBy: [{ updatedAt: "desc" }],
+      take: 25
     }),
     prisma.importSource.findMany({
       orderBy: { updatedAt: "desc" }
@@ -85,12 +152,8 @@ export default async function AdminPage({
     })
   ]);
 
-  const drafts = lineups.filter((lineup) => lineup.status === LineupStatus.draft || lineup.status === LineupStatus.pending_review);
-  const publishedCount = lineups.filter((lineup) => lineup.status === LineupStatus.published).length;
-  const pendingCount = drafts.length;
-
   return (
-    <div className="grid gap-8 pb-16 lg:grid-cols-[18rem,1fr]">
+    <div className="grid min-w-0 gap-8 pb-16 lg:grid-cols-[18rem,minmax(0,1fr)]">
       <AdminSidebar />
 
       <div className="space-y-8">
@@ -126,7 +189,7 @@ export default async function AdminPage({
           <div className="mt-6 grid gap-4 md:grid-cols-4">
             {[
               { label: "Карты", value: maps.length },
-              { label: "Все раскиды", value: lineups.length },
+              { label: "Все раскиды", value: totalLineups },
               { label: "Опубликовано", value: publishedCount },
               { label: "Черновики + модерация", value: pendingCount }
             ].map((item) => (
@@ -182,6 +245,50 @@ export default async function AdminPage({
             <h2 className="text-2xl font-semibold text-white">Раскиды</h2>
             <p className="mt-2 text-sm text-slate-400">Полный список записей, включая ручные и импортированные.</p>
           </div>
+          <form className="grid gap-3 rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/80 p-4 md:grid-cols-5" method="get">
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-400">Поиск</span>
+              <input name="q" defaultValue={q} className="admin-input" placeholder="Название, slug, позиция" />
+            </label>
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-400">Статус</span>
+              <select name="status" defaultValue={status ?? ""} className="admin-input">
+                <option value="">Все</option>
+                {Object.values(LineupStatus).map((value) => (
+                  <option key={value} value={value}>
+                    {formatStatusRu(value)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-400">Карта</span>
+              <select name="map" defaultValue={mapSlug ?? ""} className="admin-input">
+                <option value="">Все</option>
+                {maps.map((map) => (
+                  <option key={map.id} value={map.slug}>
+                    {map.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-400">Тип</span>
+              <select name="utilityType" defaultValue={utilityType ?? ""} className="admin-input">
+                <option value="">Все</option>
+                {Object.values(UtilityType).map((value) => (
+                  <option key={value} value={value}>
+                    {formatUtilityTypeRu(value)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex items-end">
+              <button type="submit" className="admin-button w-full">
+                Применить
+              </button>
+            </div>
+          </form>
           <AdminTable headers={["Название", "Карта", "Тип", "Статус", "Действия"]}>
             {lineups.map((lineup) => (
               <tr key={lineup.id} className="border-t border-white/8">
@@ -208,6 +315,13 @@ export default async function AdminPage({
               </tr>
             ))}
           </AdminTable>
+          <AdminPagination
+            page={page}
+            pageSize={pageSize}
+            total={lineupsTotal}
+            basePath="/admin"
+            searchParams={{ ...(searchParams ?? {}) }}
+          />
         </section>
 
         <section id="sources" className="grid gap-8 xl:grid-cols-[1.1fr,0.9fr]">

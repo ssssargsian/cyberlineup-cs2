@@ -1,6 +1,6 @@
 import { Difficulty, LineupStatus, Side, UtilityType } from "@prisma/client";
 
-export const APP_NAME = "CyberLineup SR";
+export const APP_NAME = "CyberLineup";
 export const APP_TAGLINE = "ИИ-помощник по раскидам CS2";
 export const APP_SUBTITLE = "Премиальный сервис для поиска, обучения и модерации раскидов гранат в Counter-Strike 2.";
 

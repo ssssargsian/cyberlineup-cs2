@@ -262,7 +262,7 @@ export default async function LineupPage({ params }: { params: { slug: string } 
           <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
             <h2 className="text-2xl font-black text-white">Источник</h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
-              {lineup.sourceName ? `Материал импортирован из источника ${lineup.sourceName}.` : "Запись добавлена вручную через CyberLineup SR."}
+              {lineup.sourceName ? `Материал импортирован из источника ${lineup.sourceName}.` : "Запись добавлена вручную через CyberLineup."}
             </p>
             {lineup.sourceUrl ? (
               <a href={lineup.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40">

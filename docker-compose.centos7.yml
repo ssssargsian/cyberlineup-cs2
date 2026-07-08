@@ -18,11 +18,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+    security_opt:
+      - label:disable
 
   app:
     image: node:22-bookworm-slim
     container_name: cyberlineup-app
     restart: unless-stopped
+    security_opt:
+      - label:disable
     working_dir: /app
     env_file:
       - .env

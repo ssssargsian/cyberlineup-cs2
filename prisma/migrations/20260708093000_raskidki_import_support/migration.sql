@@ -1,0 +1,4 @@
+ALTER TYPE "UtilityType" ADD VALUE IF NOT EXISTS 'unknown';
+
+ALTER TABLE "Lineup"
+ALTER COLUMN "area" DROP NOT NULL;

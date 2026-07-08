@@ -1,0 +1,54 @@
+{
+  "name": "cyberlineup-sr",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "prisma generate",
+    "db:up": "docker compose up -d db",
+    "db:wait": "tsx scripts/wait-for-db.ts",
+    "db:down": "docker compose down",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "import:run": "curl -X POST http://localhost:3000/api/admin/import/run",
+    "export:raskidki": "tsx scripts/export-raskidki-json.ts",
+    "audit:raskidki": "tsx scripts/audit-raskidki-json.ts",
+    "import:raskidki": "tsx scripts/import-raskidki.ts",
+    "sync:raskidki": "pnpm export:raskidki && pnpm import:raskidki",
+    "publish:imported": "tsx scripts/publish-imported-lineups.ts",
+    "hide:demo": "tsx scripts/hide-demo-lineups.ts",
+    "repair:maps": "tsx scripts/merge-duplicate-maps.ts",
+    "repair:lineup-slugs": "tsx scripts/repair-lineup-slugs.ts",
+    "bootstrap:real": "tsx scripts/bootstrap-real.ts",
+    "dev:real": "pnpm bootstrap:real && pnpm dev"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.1",
+    "cheerio": "^1.1.2",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.539.0",
+    "next": "^14.2.15",
+    "openai": "^4.56.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^5.19.1",
+    "tailwindcss": "^3.4.16",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

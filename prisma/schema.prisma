@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UtilityType {
+  smoke
+  flash
+  molotov
+  he
+  oneway
+  unknown
+}
+
+enum Side {
+  t
+  ct
+  both
+  unknown
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+  unknown
+}
+
+enum LineupStatus {
+  draft
+  pending_review
+  published
+  rejected
+}
+
+enum ImportSourceType {
+  website
+  youtube
+  api
+  manual
+}
+
+enum ImportJobStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+model Map {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  lineups     Lineup[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lineup {
+  id               Int          @id @default(autoincrement())
+  title            String
+  slug             String       @unique
+  mapId            Int
+  map              Map          @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  utilityType      UtilityType
+  side             Side         @default(unknown)
+  area             String?
+  fromPosition     String?
+  targetPosition   String?
+  difficulty       Difficulty   @default(unknown)
+  throwType        String?
+  description      String?
+  steps            Json?
+  images           Json?
+  videoUrl         String?
+  previewImageUrl  String?
+  aimImageUrl      String?
+  positionImageUrl String?
+  tags             String[]
+  aliases          String[]
+  isVerified       Boolean      @default(false)
+  status           LineupStatus @default(draft)
+  sourceName       String?
+  sourceUrl        String?
+  importedAt       DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([mapId])
+  @@index([utilityType])
+  @@index([side])
+  @@index([difficulty])
+  @@index([area])
+  @@index([status])
+  @@index([isVerified])
+}
+
+model ImportSource {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  baseUrl        String
+  type           ImportSourceType
+  isEnabled      Boolean          @default(true)
+  lastImportedAt DateTime?
+  jobs           ImportJob[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model ImportJob {
+  id           Int             @id @default(autoincrement())
+  sourceId     Int
+  source       ImportSource    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  status       ImportJobStatus @default(pending)
+  foundCount   Int             @default(0)
+  importedCount Int            @default(0)
+  skippedCount Int             @default(0)
+  errorMessage String?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  createdAt    DateTime        @default(now())
+
+  @@index([sourceId])
+  @@index([status])
+}
+
+model SearchLog {
+  id              Int      @id @default(autoincrement())
+  query           String
+  normalizedQuery String
+  resultsCount    Int
+  createdAt       DateTime @default(now())
+}

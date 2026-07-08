@@ -54,24 +54,47 @@ jobs:
           host: ${{ secrets.CYBERLINEUP_HOST }}
           username: ${{ secrets.CYBERLINEUP_USER }}
           key: ${{ secrets.CYBERLINEUP_SSH_KEY }}
-          port: ${{ secrets.CYBERLINEUP_SSH_PORT }}
+          port: 22
+          debug: true
           script_stop: true
           command_timeout: 30m
           script: |
-            set -Eeuo pipefail
+            set -Eeuxo pipefail
+
+            echo "=== Connected ==="
+            whoami
+            hostname
+            pwd
+
+            echo "=== Check files ==="
+            ls -la /opt/cyberlineup || true
+            ls -la /opt/cyberlineup/deploy.sh
+            head -n 30 /opt/cyberlineup/deploy.sh
+
+            echo "=== Check app ==="
+            ls -la /var/www/cyberlineup-sr
+            cd /var/www/cyberlineup-sr
+            git status --short
+            git remote -v
 
             if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              export RUN_MIGRATIONS="${{ inputs.run_migrations }}"
-              export RUN_SYNC="${{ inputs.run_sync }}"
-              export RUN_PUBLISH="${{ inputs.run_publish }}"
+              RUN_MIGRATIONS="${{ inputs.run_migrations }}"
+              RUN_SYNC="${{ inputs.run_sync }}"
+              RUN_PUBLISH="${{ inputs.run_publish }}"
             else
-              export RUN_MIGRATIONS="true"
-              export RUN_SYNC="false"
-              export RUN_PUBLISH="false"
+              RUN_MIGRATIONS="true"
+              RUN_SYNC="false"
+              RUN_PUBLISH="false"
             fi
 
-            sudo \
+            echo "RUN_MIGRATIONS=$RUN_MIGRATIONS"
+            echo "RUN_SYNC=$RUN_SYNC"
+            echo "RUN_PUBLISH=$RUN_PUBLISH"
+
+            echo "=== Run deploy ==="
+
+            sudo env \
               RUN_MIGRATIONS="$RUN_MIGRATIONS" \
               RUN_SYNC="$RUN_SYNC" \
               RUN_PUBLISH="$RUN_PUBLISH" \
-              /opt/cyberlineup/deploy.sh
+              bash -x /opt/cyberlineup/deploy.sh

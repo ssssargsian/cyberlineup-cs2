@@ -10,11 +10,11 @@ export const metadata: Metadata = {
   description: "Раскидки CS2 за секунды",
   icons: {
     icon: [
-      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/svg+xml" },
       { url: "/icon.svg", type: "image/svg+xml" }
     ],
-    shortcut: "/logo.svg",
-    apple: "/logo.svg"
+    shortcut: "/logo.png",
+    apple: "/logo.png"
   }
 };
 

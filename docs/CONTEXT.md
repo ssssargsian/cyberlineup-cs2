@@ -64,9 +64,9 @@ CyberLineup — платформа поиска раскидов CS2 с импо
 - Imported and remote images render through `ImportedImage`, so photos are visible immediately and fallback appears only on load error or empty `src`.
 - Public UI now uses a cleaner Dark Minimal Gaming SaaS direction: readable typography, restrained orange/cyan accents, softer panels, less decorative noise and Russian-only public labels.
 - Public brand is `CyberLineup` without `SR` and without `Sargsian Rafik`.
-- Header uses `public/logo.svg`, a compact tactical shield/crosshair/grenade mark, and switches to a burger dropdown on mobile.
+- Header uses `public/logo.png`, a compact tactical shield/crosshair/grenade mark, and switches to a burger dropdown on mobile.
 - Home page first screen is compact and product-first: headline `Раскидки CS2 за секунды`, short explanation, main search form and compact popular query shortcuts. The logo stays in the header, not as a separate hero card.
-- Metadata explicitly sets `title: CyberLineup` and SVG icons through `/logo.svg` and `/icon.svg`.
+- Metadata explicitly sets `title: CyberLineup` and SVG icons through `/logo.png` and `/icon.svg`.
 - Admin lineup lists now use server-side pagination with `page`, `pageSize`, `q`, `status`, `map`, and `utilityType` query params.
 - `/admin/imports` pending-review list also uses server-side pagination.
 - Admin tables use an internal horizontal scroll wrapper on mobile instead of forcing page-wide overflow.

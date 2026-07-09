@@ -1,4 +1,5 @@
 import { Difficulty, Side, UtilityType } from "@prisma/client";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/EmptyState";
@@ -9,8 +10,22 @@ import { prisma } from "@/lib/prisma";
 import { ButtonLink } from "@/src/components/ui/Button";
 import { formatDifficultyRu, formatMapNameRu, formatSideRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
 import { searchLineups } from "@/src/lib/search";
+import { absoluteUrl } from "@/src/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Поиск раскидок CS2",
+  description: "Поиск смоков, флешек, молотовых и HE в CS2 обычным языком: карта, зона, позиция и фото шагов.",
+  alternates: {
+    canonical: absoluteUrl("/search")
+  },
+  openGraph: {
+    title: "Поиск раскидок CS2 | CyberLineup",
+    description: "Ищите раскидки CS2 обычным языком: смоки, флешки, молотовы и HE.",
+    url: absoluteUrl("/search")
+  }
+};
 
 function parseBoolean(value?: string) {
   return value === "true" || value === "on";

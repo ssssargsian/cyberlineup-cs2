@@ -1,0 +1,24 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#05070D"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#grid)" opacity="0.22"/>
+  <circle cx="230" cy="110" r="250" fill="#FF5500" opacity="0.16"/>
+  <circle cx="980" cy="150" r="260" fill="#22D3EE" opacity="0.13"/>
+  <circle cx="800" cy="560" r="260" fill="#8B5CF6" opacity="0.1"/>
+  <rect x="78" y="78" width="1044" height="474" rx="44" fill="#0B0F18" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+  <path d="M186 177L255 141L324 177V253C324 321 279 363 255 374C231 363 186 321 186 253V177Z" fill="#111827" stroke="#FF5500" stroke-width="10"/>
+  <circle cx="255" cy="243" r="48" stroke="#22D3EE" stroke-width="10"/>
+  <path d="M255 184V302M196 243H314" stroke="#F8FAFC" stroke-width="7" stroke-linecap="round"/>
+  <path d="M238 270L272 236" stroke="#FF5500" stroke-width="12" stroke-linecap="round"/>
+  <text x="382" y="244" fill="#F8FAFC" font-family="Inter, Manrope, Arial, sans-serif" font-size="86" font-weight="900" letter-spacing="-3">CyberLineup</text>
+  <text x="386" y="323" fill="#CBD5E1" font-family="Inter, Manrope, Arial, sans-serif" font-size="42" font-weight="700">Раскидки CS2 за секунды</text>
+  <text x="386" y="389" fill="#94A3B8" font-family="Inter, Manrope, Arial, sans-serif" font-size="28" font-weight="500">Смоки, флешки, молотовы и HE с фото шагов</text>
+  <rect x="386" y="438" width="232" height="54" rx="18" fill="#FF5500"/>
+  <text x="418" y="474" fill="white" font-family="Inter, Manrope, Arial, sans-serif" font-size="22" font-weight="800">Найти раскид</text>
+  <rect x="638" y="438" width="236" height="54" rx="18" fill="#0A1420" stroke="#22D3EE" stroke-opacity="0.45"/>
+  <text x="670" y="474" fill="#A5F3FC" font-family="Inter, Manrope, Arial, sans-serif" font-size="22" font-weight="800">cyberlineup.ru</text>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#94A3B8" stroke-opacity="0.24"/>
+    </pattern>
+  </defs>
+</svg>

@@ -1,4 +1,5 @@
 import { Crosshair, ExternalLink, Flag, MapPinned, Route, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -12,10 +13,56 @@ import { VideoEmbed } from "@/components/VideoEmbed";
 import { prisma } from "@/lib/prisma";
 import { ZoomableImage } from "@/src/components/ZoomableImage";
 import type { LineupImage, LineupStep } from "@/src/lib/importers/types";
-import { formatAreaRu, formatLineupTitleRu, formatMapNameRu, formatSideRu, formatStatusRu, formatThrowTypeRu } from "@/src/lib/i18n/lineupDisplay";
+import { formatAreaRu, formatLineupTitleRu, formatMapNameRu, formatSideRu, formatStatusRu, formatThrowTypeRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
+import { absoluteUrl } from "@/src/lib/seo";
 import { LineupStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const requestedSlug = decodeURIComponent(params.slug);
+  const lineup = await prisma.lineup.findUnique({
+    where: { slug: requestedSlug },
+    include: { map: true }
+  });
+
+  if (!lineup || lineup.status !== LineupStatus.published) {
+    return {
+      title: "Раскидка не найдена",
+      robots: {
+        index: false,
+        follow: false
+      }
+    };
+  }
+
+  const mapName = formatMapNameRu(lineup.map.name, lineup.map.slug);
+  const utilityTypeRu = formatUtilityTypeRu(lineup.utilityType);
+  const area = formatAreaRu(lineup.area);
+  const title = `${utilityTypeRu} ${area} на ${mapName} CS2 — раскидка`;
+  const description = `${utilityTypeRu} на ${mapName} в CS2. Позиция, прицел, шаги с фото и результат раскидки на CyberLineup.`;
+  const url = absoluteUrl(`/lineups/${lineup.slug}`);
+  const imageUrl = lineup.previewImageUrl || undefined;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url
+    },
+    openGraph: {
+      title: `${title} | CyberLineup`,
+      description,
+      url,
+      images: imageUrl ? [{ url: imageUrl, alt: formatLineupTitleRu(lineup.title) }] : undefined
+    },
+    twitter: {
+      title: `${title} | CyberLineup`,
+      description,
+      images: imageUrl ? [imageUrl] : undefined
+    }
+  };
+}
 
 function parseLineupSteps(value: unknown): LineupStep[] {
   if (!Array.isArray(value)) {
@@ -110,6 +157,9 @@ export default async function LineupPage({ params }: { params: { slug: string } 
   const heroImageUrl = lineup.previewImageUrl ?? images[0]?.url ?? steps.find((step) => step.imageUrl)?.imageUrl ?? null;
   const displayTitle = formatLineupTitleRu(lineup.title);
   const displayMapName = formatMapNameRu(lineup.map.name, lineup.map.slug);
+  const utilityTypeRu = formatUtilityTypeRu(lineup.utilityType);
+  const areaRu = formatAreaRu(lineup.area);
+  const seoHeading = `${utilityTypeRu} на ${areaRu} ${displayMapName} в CS2`;
 
   return (
     <div className="space-y-8 pb-16">
@@ -126,7 +176,8 @@ export default async function LineupPage({ params }: { params: { slug: string } 
               {lineup.isVerified ? <Badge className="border-emerald-400/25 bg-emerald-500/10 text-emerald-200">Проверено</Badge> : null}
               <SourceBadge name={lineup.sourceName} />
             </div>
-            <h1 className="max-w-5xl text-4xl font-black leading-tight text-white sm:text-6xl">{displayTitle}</h1>
+            <h1 className="max-w-5xl text-4xl font-black leading-tight text-white sm:text-6xl">{seoHeading}</h1>
+            <p className="mt-3 max-w-3xl text-base font-semibold text-slate-200">{displayTitle}</p>
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-200">
               <span className="inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-500/10 px-3 py-1 font-semibold text-orange-100">
                 <MapPinned className="h-4 w-4" />
@@ -137,7 +188,10 @@ export default async function LineupPage({ params }: { params: { slug: string } 
                 {lineup.fromPosition ?? "Позиция не указана"} → {lineup.targetPosition ?? "Цель не указана"}
               </span>
             </div>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-200">{lineup.description ?? "Описание пока не добавлено."}</p>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-200">
+              {lineup.description ??
+                `${utilityTypeRu} для карты ${displayMapName}: позиция, цель, шаги с фото и детали раскидки в CyberLineup.`}
+            </p>
           </div>
         </div>
 

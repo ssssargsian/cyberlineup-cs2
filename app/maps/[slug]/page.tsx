@@ -1,4 +1,5 @@
 import { Difficulty, LineupStatus, Side, UtilityType } from "@prisma/client";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { EmptyState } from "@/components/EmptyState";
@@ -6,11 +7,72 @@ import { LineupCard } from "@/components/LineupCard";
 import { prisma } from "@/lib/prisma";
 import { MAP_HERO_ACCENTS } from "@/src/lib/catalog";
 import { formatDifficultyRu, formatMapDescriptionRu, formatMapNameRu, formatSideRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
+import { absoluteUrl } from "@/src/lib/seo";
 
 export const dynamic = "force-dynamic";
 
+const mapTitleFragments: Record<string, string> = {
+  inferno: "смоки и молотовы",
+  ancient: "флешки и HE",
+  mirage: "смоки и флешки"
+};
+
 function parseBoolean(value?: string) {
   return value === "true" || value === "on";
+}
+
+async function findMapBySlug(slug: string) {
+  const isDustAlias = slug === "dust-2" || slug === "dust-ii" || slug === "dust2";
+
+  if (isDustAlias) {
+    return prisma.map.findFirst({
+      where: {
+        OR: [{ slug: "dust-2" }, { slug: "dust-ii" }, { slug: "dust2" }, { name: "Dust II" }, { name: "Dust 2" }]
+      },
+      orderBy: [{ slug: "asc" }, { id: "asc" }]
+    });
+  }
+
+  return prisma.map.findUnique({
+    where: { slug }
+  });
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const map = await findMapBySlug(params.slug);
+
+  if (!map) {
+    return {
+      title: "Карта не найдена",
+      robots: {
+        index: false,
+        follow: false
+      }
+    };
+  }
+
+  const displayMapName = formatMapNameRu(map.name, map.slug);
+  const utilityFragment = mapTitleFragments[map.slug] ?? "смоки и флешки";
+  const title = `${displayMapName} — раскидки CS2, ${utilityFragment}`;
+  const description = `Раскидки CS2 на карте ${displayMapName}: смоки, флешки, молотовы и HE с фото шагов. Быстрый поиск по карте на CyberLineup.`;
+  const canonicalPath = `/maps/${map.slug === "dust-ii" || map.slug === "dust2" ? "dust-2" : map.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: absoluteUrl(canonicalPath)
+    },
+    openGraph: {
+      title: `${title} | CyberLineup`,
+      description,
+      url: absoluteUrl(canonicalPath)
+    },
+    twitter: {
+      title: `${title} | CyberLineup`,
+      description
+    }
+  };
 }
 
 export default async function MapPage({
@@ -26,17 +88,7 @@ export default async function MapPage({
     verifiedOnly?: string;
   };
 }) {
-  const isDustAlias = params.slug === "dust-2" || params.slug === "dust-ii" || params.slug === "dust2";
-  const map = isDustAlias
-    ? await prisma.map.findFirst({
-        where: {
-          OR: [{ slug: "dust-2" }, { slug: "dust-ii" }, { slug: "dust2" }, { name: "Dust II" }, { name: "Dust 2" }]
-        },
-        orderBy: [{ slug: "asc" }, { id: "asc" }]
-      })
-    : await prisma.map.findUnique({
-        where: { slug: params.slug }
-      });
+  const map = await findMapBySlug(params.slug);
 
   if (!map) {
     notFound();
@@ -95,8 +147,12 @@ export default async function MapPage({
         <div className="relative grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
           <div>
             <div className="tactical-label text-orange-200">Карта</div>
-            <h1 className="mt-2 text-5xl font-black leading-none text-white">{displayMapName}</h1>
+            <h1 className="mt-2 text-4xl font-black leading-tight text-white sm:text-5xl">Раскидки CS2 на {displayMapName}</h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">{formatMapDescriptionRu(map.slug, map.description)}</p>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
+              На этой странице собраны раскидки CS2 для карты {displayMapName}: смоки, флешки, молотовы и HE. Используйте поиск
+              CyberLineup, чтобы быстро найти нужную гранату.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {["smoke", "flash", "molotov", "he", "oneway"].map((type) => (

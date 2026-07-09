@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
+
 import { AssistantChat } from "@/components/AssistantChat";
+import { absoluteUrl } from "@/src/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Ассистент по раскидкам CS2",
+  description: "ИИ-помощник CyberLineup отвечает по опубликованной базе раскидок CS2 и не выдумывает позиции или гранаты.",
+  alternates: {
+    canonical: absoluteUrl("/assistant")
+  },
+  openGraph: {
+    title: "Ассистент по раскидкам CS2 | CyberLineup",
+    description: "Задавайте вопросы по смокам, флешкам, молотовым и HE в CS2.",
+    url: absoluteUrl("/assistant")
+  }
+};
 
 export default function AssistantPage() {
   return (

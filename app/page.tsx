@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCheck, Crosshair, DatabaseZap, Flame, MapPinned, Search, Sparkles, Video, Zap } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LineupCard } from "@/components/LineupCard";
@@ -6,9 +7,29 @@ import { MapCard } from "@/components/MapCard";
 import { SearchBar } from "@/components/SearchBar";
 import { prisma } from "@/lib/prisma";
 import { BENEFITS, POPULAR_QUERIES } from "@/src/lib/catalog";
+import { HOME_SEO_DESCRIPTION, HOME_SEO_TITLE, SITE_NAME, SITE_URL, absoluteUrl } from "@/src/lib/seo";
 import { LineupStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: HOME_SEO_TITLE
+  },
+  description: HOME_SEO_DESCRIPTION,
+  alternates: {
+    canonical: SITE_URL
+  },
+  openGraph: {
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION,
+    url: SITE_URL
+  },
+  twitter: {
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION
+  }
+};
 
 const icons = [Search, Sparkles, Video, DatabaseZap, CheckCheck];
 
@@ -93,9 +114,24 @@ export default async function HomePage() {
     { label: "Молотовых", value: utilityCounterMap.molotov ?? 0, icon: Flame, accent: "bg-orange-400" },
     { label: "HE", value: utilityCounterMap.he ?? 0, icon: Sparkles, accent: "bg-emerald-300" }
   ];
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    alternateName: ["Cyber Lineup", "Кибер Лайнап", "Раскидки CS2"],
+    url: SITE_URL,
+    description: "Быстрый поиск раскидок CS2: смоки, флешки, молотовы и HE.",
+    inLanguage: "ru-RU",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${absoluteUrl("/search")}?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
 
   return (
     <div className="space-y-10 pb-16 sm:space-y-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <section className="tactical-panel px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
         <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center">
           <div className="inline-flex items-center rounded-full border border-orange-400/20 bg-orange-500/10 px-3 py-1.5 text-xs font-bold text-orange-100">
@@ -127,6 +163,20 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/82 p-5 sm:p-6">
+        <h2 className="text-2xl font-extrabold text-white">CyberLineup — поиск раскидок CS2</h2>
+        <div className="mt-3 grid gap-4 text-sm leading-7 text-slate-300 lg:grid-cols-[1.4fr_0.9fr]">
+          <p>
+            CyberLineup помогает быстро находить раскидки CS2: смоки, флешки, молотовы и HE гранаты CS2. Можно искать обычным языком:
+            например, «смок B Dust 2», «флеш мид Mirage» или «молик car Inferno».
+          </p>
+          <p>
+            Проект также можно найти как Cyber Lineup или Кибер Лайнап — сервис для игроков, которым нужны смоки кс2, флешки CS2,
+            молотовы CS2 и понятные шаги с фото.
+          </p>
         </div>
       </section>
 

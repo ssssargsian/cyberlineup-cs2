@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { SEARCH_PLACEHOLDER } from "@/src/lib/catalog";
+import { trackGoal } from "@/src/lib/analytics";
 import { cn } from "@/lib/utils";
 
 export function SearchBar({
@@ -37,8 +38,12 @@ export function SearchBar({
       onSubmit={(event) => {
         event.preventDefault();
         const params = new URLSearchParams();
-        if (query.trim()) {
-          params.set("q", query.trim());
+        const trimmedQuery = query.trim();
+
+        trackGoal("search_submit", { query: trimmedQuery });
+
+        if (trimmedQuery) {
+          params.set("q", trimmedQuery);
         }
         router.push(params.toString() ? `${actionPath}?${params.toString()}` : actionPath);
       }}

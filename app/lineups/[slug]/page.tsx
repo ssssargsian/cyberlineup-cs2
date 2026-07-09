@@ -10,7 +10,7 @@ import { SourceBadge } from "@/components/SourceBadge";
 import { UtilityTypeBadge } from "@/components/UtilityTypeBadge";
 import { VideoEmbed } from "@/components/VideoEmbed";
 import { prisma } from "@/lib/prisma";
-import { ImportedImage } from "@/src/components/ImportedImage";
+import { ZoomableImage } from "@/src/components/ZoomableImage";
 import type { LineupImage, LineupStep } from "@/src/lib/importers/types";
 import { formatAreaRu, formatLineupTitleRu, formatMapNameRu, formatSideRu, formatStatusRu, formatThrowTypeRu } from "@/src/lib/i18n/lineupDisplay";
 import { LineupStatus } from "@prisma/client";
@@ -115,7 +115,7 @@ export default async function LineupPage({ params }: { params: { slug: string } 
     <div className="space-y-8 pb-16">
       <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/95 shadow-[0_28px_110px_rgba(0,0,0,0.36)]">
         <div className="relative min-h-[18rem] border-b border-white/10 sm:min-h-[24rem]">
-          <ImportedImage src={heroImageUrl} alt={displayTitle} className="absolute inset-0" imgClassName="object-cover" />
+          <ZoomableImage src={heroImageUrl} alt={displayTitle} className="absolute inset-0" imgClassName="object-cover" caption="Увеличить фото" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/92 via-[#05070D]/38 to-black/10" />
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
           <div className="relative flex min-h-[18rem] flex-col justify-end p-6 sm:min-h-[24rem] sm:p-8">
@@ -208,12 +208,13 @@ export default async function LineupPage({ params }: { params: { slug: string } 
                     <div className="flex-1">
                       <div className="text-base font-black text-white">{step.title}</div>
                       <p className="mt-2 text-sm leading-7 text-slate-300">{step.text}</p>
-                      <ImportedImage
+                      <ZoomableImage
                         src={step.localImageUrl ?? step.imageUrl}
                         alt={step.title}
                         fallbackLabel="Фото шага пока нет"
                         className="mt-4 aspect-video w-full rounded-2xl border border-white/10"
                         imgClassName="transition duration-500 hover:scale-[1.02]"
+                        caption="Нажмите, чтобы увеличить"
                       />
                     </div>
                   </div>
@@ -230,9 +231,14 @@ export default async function LineupPage({ params }: { params: { slug: string } 
             <h2 className="text-3xl font-black text-white">Фотографии</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {galleryImages.map((image) => (
-                <a key={image.url} href={image.sourceUrl} target="_blank" rel="noreferrer" className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 transition hover:-translate-y-1 hover:border-cyan-400/25">
-                  <ImportedImage src={image.localUrl ?? image.url} alt={image.alt} className="aspect-video w-full" imgClassName="transition duration-500 hover:scale-[1.03]" />
-                </a>
+                <ZoomableImage
+                  key={image.url}
+                  src={image.localUrl ?? image.url}
+                  alt={image.alt}
+                  className="aspect-video w-full rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 transition hover:-translate-y-1 hover:border-cyan-400/25"
+                  imgClassName="transition duration-500 hover:scale-[1.03]"
+                  caption="Увеличить"
+                />
               ))}
             </div>
           </section>

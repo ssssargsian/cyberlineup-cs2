@@ -39,7 +39,11 @@ export function ImportedImage({
   return (
     <div className={cn(!hasPositionClass && "relative", "overflow-hidden bg-slate-950/70", className)}>
       {!loaded ? (
-        <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,rgba(15,23,42,0.92),rgba(34,211,238,0.12),rgba(15,23,42,0.92))]" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(110deg,rgba(15,23,42,0.92),rgba(34,211,238,0.12),rgba(15,23,42,0.92))]">
+          <span className="animate-pulse rounded-full border border-white/10 bg-black/25 px-3 py-1.5 text-xs font-semibold text-slate-300">
+            Загрузка фото...
+          </span>
+        </div>
       ) : null}
       <img
         src={src}

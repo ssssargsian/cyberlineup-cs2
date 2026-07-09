@@ -1,4 +1,6 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { TelegramCta } from "@/components/TelegramCta";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -8,7 +10,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
         <Header />
         <main className="flex-1">{children}</main>
+        <Footer />
       </div>
+      <TelegramCta />
     </div>
   );
 }

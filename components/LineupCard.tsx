@@ -9,6 +9,7 @@ import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { SourceBadge } from "@/components/SourceBadge";
 import { UtilityTypeBadge } from "@/components/UtilityTypeBadge";
 import { ImportedImage } from "@/src/components/ImportedImage";
+import { trackGoal } from "@/src/lib/analytics";
 import { formatAreaRu, formatLineupTitleRu, formatMapNameRu } from "@/src/lib/i18n/lineupDisplay";
 
 type LineupCardProps = {
@@ -38,7 +39,11 @@ export function LineupCard({ lineup }: LineupCardProps) {
 
   return (
     <motion.div className="h-full" whileHover={{ y: -3 }} transition={{ duration: 0.18 }}>
-      <Link href={`/lineups/${lineup.slug}`} className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 shadow-[0_20px_70px_rgba(0,0,0,0.3)] transition duration-200 hover:border-orange-400/35 hover:shadow-[0_24px_90px_rgba(255,85,0,0.14)]">
+      <Link
+        href={`/lineups/${lineup.slug}`}
+        onClick={() => trackGoal("lineup_open", { slug: lineup.slug, map: displayMapName, utilityType: lineup.utilityType })}
+        className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 shadow-[0_20px_70px_rgba(0,0,0,0.3)] transition duration-200 hover:border-orange-400/35 hover:shadow-[0_24px_90px_rgba(255,85,0,0.14)]"
+      >
         <div className="relative aspect-[16/10] overflow-hidden border-b border-white/10 bg-[#05070d]">
           <ImportedImage
             src={lineup.previewImageUrl}

@@ -151,7 +151,7 @@ export default async function HomePage() {
         })}
       </section>
 
-      <section className="space-y-5">
+      <section id="maps" className="scroll-mt-28 space-y-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="section-title">Карты</h2>

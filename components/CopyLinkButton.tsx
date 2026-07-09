@@ -3,7 +3,9 @@
 import { Copy, CopyCheck } from "lucide-react";
 import { useState } from "react";
 
-export function CopyLinkButton({ url }: { url: string }) {
+import { trackGoal } from "@/src/lib/analytics";
+
+export function CopyLinkButton({ url, lineupSlug }: { url: string; lineupSlug?: string }) {
   const [copied, setCopied] = useState(false);
 
   return (
@@ -11,6 +13,7 @@ export function CopyLinkButton({ url }: { url: string }) {
       type="button"
       onClick={async () => {
         await navigator.clipboard.writeText(url);
+        trackGoal("share_click", { lineupSlug });
         setCopied(true);
         setTimeout(() => setCopied(false), 1800);
       }}

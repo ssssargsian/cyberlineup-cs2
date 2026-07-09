@@ -1,4 +1,4 @@
-import { Crosshair, ExternalLink, Flag, MapPinned, Route, ShieldCheck } from "lucide-react";
+import { ExternalLink, MapPinned, Route, Send } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,9 +9,12 @@ import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { LineupCard } from "@/components/LineupCard";
 import { SourceBadge } from "@/components/SourceBadge";
 import { UtilityTypeBadge } from "@/components/UtilityTypeBadge";
-import { VideoEmbed } from "@/components/VideoEmbed";
 import { prisma } from "@/lib/prisma";
+import { FeedbackTrigger } from "@/src/components/FeedbackTrigger";
+import { LineupVideo } from "@/src/components/LineupVideo";
+import { TrackedExternalLink } from "@/src/components/TrackedExternalLink";
 import { ZoomableImage } from "@/src/components/ZoomableImage";
+import { getExternalLineupVideo } from "@/src/lib/external-videos";
 import type { LineupImage, LineupStep } from "@/src/lib/importers/types";
 import { formatAreaRu, formatLineupTitleRu, formatMapNameRu, formatSideRu, formatStatusRu, formatThrowTypeRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
 import { absoluteUrl } from "@/src/lib/seo";
@@ -120,6 +123,20 @@ function parseLineupImages(value: unknown): LineupImage[] {
     .filter((image): image is LineupImage => image !== null);
 }
 
+function getStepCallout(step: LineupStep) {
+  const text = `${step.title} ${step.text}`.toLowerCase();
+
+  if (/(прицел|наводим|aim|crosshair)/i.test(text)) {
+    return "Точка прицела";
+  }
+
+  if (/(итог|результат|result)/i.test(text)) {
+    return "Итог";
+  }
+
+  return null;
+}
+
 export default async function LineupPage({ params }: { params: { slug: string } }) {
   const requestedSlug = decodeURIComponent(params.slug);
   const lineup = await prisma.lineup.findUnique({
@@ -136,7 +153,7 @@ export default async function LineupPage({ params }: { params: { slug: string } 
       id: { not: lineup.id },
       status: LineupStatus.published,
       mapId: lineup.mapId,
-      area: lineup.area,
+      utilityType: lineup.utilityType,
       NOT: {
         OR: [
           { slug: { startsWith: "demo-" } },
@@ -146,7 +163,7 @@ export default async function LineupPage({ params }: { params: { slug: string } 
       }
     },
     include: { map: true },
-    take: 3,
+    take: 6,
     orderBy: [{ isVerified: "desc" }, { updatedAt: "desc" }]
   });
 
@@ -160,6 +177,9 @@ export default async function LineupPage({ params }: { params: { slug: string } 
   const utilityTypeRu = formatUtilityTypeRu(lineup.utilityType);
   const areaRu = formatAreaRu(lineup.area);
   const seoHeading = `${utilityTypeRu} на ${areaRu} ${displayMapName} в CS2`;
+  const externalVideo = getExternalLineupVideo(lineup.slug);
+  const sourceName = externalVideo?.sourceName ?? lineup.sourceName;
+  const sourceUrl = externalVideo?.sourceUrl ?? lineup.sourceUrl;
 
   return (
     <div className="space-y-8 pb-16">
@@ -169,6 +189,13 @@ export default async function LineupPage({ params }: { params: { slug: string } 
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070D]/92 via-[#05070D]/38 to-black/10" />
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
           <div className="relative flex min-h-[18rem] flex-col justify-end p-6 sm:min-h-[24rem] sm:p-8">
+            <div className="mb-4 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-300">
+              <Link href="/" className="transition hover:text-white">Главная</Link>
+              <span className="text-slate-600">/</span>
+              <Link href={`/maps/${lineup.map.slug}`} className="transition hover:text-white">{displayMapName}</Link>
+              <span className="text-slate-600">/</span>
+              <span className="text-slate-100">Раскидка</span>
+            </div>
             <div className="mb-4 flex flex-wrap gap-2">
               <UtilityTypeBadge value={lineup.utilityType} />
               <DifficultyBadge value={lineup.difficulty} />
@@ -192,63 +219,67 @@ export default async function LineupPage({ params }: { params: { slug: string } 
               {lineup.description ??
                 `${utilityTypeRu} для карты ${displayMapName}: позиция, цель, шаги с фото и детали раскидки в CyberLineup.`}
             </p>
-          </div>
-        </div>
-
-        <div className="p-6 sm:p-8">
-        <div className="grid gap-5 lg:grid-cols-4">
-          <div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Карта</div>
-                <Link href={`/maps/${lineup.map.slug}`} className="inline-flex items-center gap-2 text-lg font-black text-cyan-200">
-                  <MapPinned className="h-4 w-4" />
-                  {displayMapName}
-                </Link>
-              </div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Зона</div>
-                <div className="inline-flex items-center gap-2 text-lg font-black text-white">
-                  <Crosshair className="h-4 w-4 text-orange-200" />
-                  {formatAreaRu(lineup.area)}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Откуда</div>
-                <div className="truncate text-lg font-black text-white">{lineup.fromPosition ?? "Не указано"}</div>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Куда</div>
-                <div className="truncate text-lg font-black text-white">{lineup.targetPosition ?? "Не указано"}</div>
-              </div>
-
-            <div className="mt-6 flex flex-wrap gap-3 lg:col-span-4">
-              <CopyLinkButton url={currentUrl} />
-              <a
-                href={`mailto:raskidki-granat@mail.ru?subject=${encodeURIComponent(`Ошибка в раскиде: ${displayTitle}`)}&body=${encodeURIComponent(`Проверьте раскид: ${currentUrl}`)}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-red-400/30 hover:bg-red-500/10"
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href={`/maps/${lineup.map.slug}`} className="inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40">
+                <MapPinned className="h-4 w-4" />
+                Открыть карту
+              </Link>
+              <CopyLinkButton url={currentUrl} lineupSlug={lineup.slug} />
+              <TrackedExternalLink
+                href="https://t.me/cyberlineup"
+                target="_blank"
+                rel="noreferrer"
+                goal="telegram_click"
+                params={{ source: "lineup", lineupSlug: lineup.slug }}
+                className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/45"
               >
-                <Flag className="h-4 w-4" />
-                Сообщить об ошибке
-              </a>
-              {lineup.sourceUrl ? (
-                <a
-                  href={lineup.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40 hover:bg-orange-500/15"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Источник
-                </a>
-              ) : null}
+                <Send className="h-4 w-4" />
+                Telegram
+              </TrackedExternalLink>
+              <FeedbackTrigger
+                currentUrl={currentUrl}
+                lineupSlug={lineup.slug}
+                mapSlug={lineup.map.slug}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-orange-300/35"
+              />
             </div>
+          </div>
         </div>
-        </div>
+
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr),24rem]">
         <div className="space-y-6">
+        <LineupVideo
+          videoUrl={lineup.videoUrl}
+          externalVideoUrl={externalVideo?.externalVideoUrl}
+          posterUrl={heroImageUrl}
+          sourceUrl={sourceUrl}
+          sourceName={sourceName}
+          credit={externalVideo?.credit}
+          lineupSlug={lineup.slug}
+          map={displayMapName}
+          utilityType={lineup.utilityType}
+        />
+
+        <div className="rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
+          <h2 className="text-3xl font-black text-white">Краткая инструкция</h2>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {[
+              ["01", "Встаньте на позицию", lineup.fromPosition ?? "Позиция указана в шагах или на фото."],
+              ["02", "Наведите прицел", "Откройте фото шага и приблизьте точку прицела через zoom."],
+              ["03", "Сделайте бросок", formatThrowTypeRu(lineup.throwType)],
+              ["04", "Проверьте результат", lineup.targetPosition ?? "Смотрите итоговый шаг и описание."]
+            ].map(([number, title, text]) => (
+              <div key={number} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="text-2xl font-black text-orange-200">{number}</div>
+                <div className="mt-2 font-black text-white">{title}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-[1.75rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
           <h2 className="text-3xl font-black text-white">Как кинуть</h2>
           <ol className="mt-5 space-y-3">
@@ -261,6 +292,11 @@ export default async function LineupPage({ params }: { params: { slug: string } 
                     </div>
                     <div className="flex-1">
                       <div className="text-base font-black text-white">{step.title}</div>
+                      {getStepCallout(step) ? (
+                        <div className="mt-3 inline-flex rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-100">
+                          {getStepCallout(step)}
+                        </div>
+                      ) : null}
                       <p className="mt-2 text-sm leading-7 text-slate-300">{step.text}</p>
                       <ZoomableImage
                         src={step.localImageUrl ?? step.imageUrl}
@@ -300,8 +336,6 @@ export default async function LineupPage({ params }: { params: { slug: string } 
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <VideoEmbed url={lineup.videoUrl} />
-
           <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
             <h2 className="text-2xl font-black text-white">Детали раскида</h2>
             <div className="mt-5 grid gap-3 text-sm text-slate-300">
@@ -322,14 +356,37 @@ export default async function LineupPage({ params }: { params: { slug: string } 
           <div className="rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-6 shadow-[0_22px_80px_rgba(0,0,0,0.3)]">
             <h2 className="text-2xl font-black text-white">Источник</h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
-              {lineup.sourceName ? `Материал импортирован из источника ${lineup.sourceName}.` : "Запись добавлена вручную через CyberLineup."}
+              {sourceName ? `Материал импортирован из источника ${sourceName}.` : "Запись добавлена вручную через CyberLineup."}
             </p>
-            {lineup.sourceUrl ? (
-              <a href={lineup.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40">
+            {sourceUrl ? (
+              <TrackedExternalLink
+                href={sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                goal="source_open"
+                params={{ lineupSlug: lineup.slug, sourceName, sourceUrl }}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-orange-400/25 bg-orange-500/10 px-4 py-3 text-sm font-semibold text-orange-100 transition hover:border-orange-300/40"
+              >
                 <ExternalLink className="h-4 w-4" />
                 Открыть оригинал
-              </a>
+              </TrackedExternalLink>
             ) : null}
+          </div>
+
+          <div className="rounded-[1.5rem] border border-cyan-300/15 bg-cyan-400/[0.045] p-6">
+            <h2 className="text-2xl font-black text-white">Больше раскидок в Telegram</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300">Подписывайся на @cyberlineup — новые смоки, флешки и подборки по картам.</p>
+            <TrackedExternalLink
+              href="https://t.me/cyberlineup"
+              target="_blank"
+              rel="noreferrer"
+              goal="telegram_click"
+              params={{ source: "lineup_sidebar", lineupSlug: lineup.slug }}
+              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-orange-400/35 bg-[#ff5500] px-4 py-3 text-sm font-extrabold text-white transition hover:bg-[#f97316]"
+            >
+              <Send className="h-4 w-4" />
+              Открыть Telegram
+            </TrackedExternalLink>
           </div>
         </aside>
       </section>

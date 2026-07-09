@@ -33,6 +33,13 @@ export function Footer() {
                 {link.label}
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("cyberlineup:open-feedback"))}
+              className="text-left text-sm font-semibold text-slate-300 transition hover:text-orange-200"
+            >
+              Предложить улучшение
+            </button>
             <a
               href={telegramUrl}
               target="_blank"

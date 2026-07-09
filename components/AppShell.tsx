@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { TelegramCta } from "@/components/TelegramCta";
+import { FeedbackButton } from "@/src/components/FeedbackButton";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Footer />
       </div>
       <TelegramCta />
+      <FeedbackButton />
     </div>
   );
 }

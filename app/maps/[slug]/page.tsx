@@ -5,8 +5,11 @@ import { notFound, redirect } from "next/navigation";
 import { EmptyState } from "@/components/EmptyState";
 import { LineupCard } from "@/components/LineupCard";
 import { prisma } from "@/lib/prisma";
+import { TrackedExternalLink } from "@/src/components/TrackedExternalLink";
+import { LineupFilters } from "@/src/components/maps/LineupFilters";
+import { LineupMap } from "@/src/components/maps/LineupMap";
 import { MAP_HERO_ACCENTS } from "@/src/lib/catalog";
-import { formatDifficultyRu, formatMapDescriptionRu, formatMapNameRu, formatSideRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
+import { formatMapDescriptionRu, formatMapNameRu, formatUtilityTypeRu } from "@/src/lib/i18n/lineupDisplay";
 import { absoluteUrl } from "@/src/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +22,14 @@ const mapTitleFragments: Record<string, string> = {
 
 function parseBoolean(value?: string) {
   return value === "true" || value === "on";
+}
+
+function canonicalMapKey(map: { name: string; slug: string }) {
+  if (map.slug === "dust-2" || map.slug === "dust-ii" || map.slug === "dust2" || map.name === "Dust II") {
+    return "dust-2";
+  }
+
+  return map.slug;
 }
 
 async function findMapBySlug(slug: string) {
@@ -115,7 +126,7 @@ export default async function MapPage({
     ...(parseBoolean(searchParams?.verifiedOnly) ? { isVerified: true } : {})
   };
 
-  const [lineups, counters] = await Promise.all([
+  const [lineups, counters, areas, allMaps] = await Promise.all([
     prisma.lineup.findMany({
       where,
       include: { map: true },
@@ -135,11 +146,54 @@ export default async function MapPage({
         }
       },
       _count: true
+    }),
+    prisma.lineup.findMany({
+      where: {
+        mapId: map.id,
+        status: LineupStatus.published,
+        area: { not: null },
+        NOT: {
+          OR: [
+            { slug: { startsWith: "demo-" } },
+            { sourceName: { contains: "Demo", mode: "insensitive" as const } },
+            { tags: { has: "demo" } }
+          ]
+        }
+      },
+      select: { area: true },
+      distinct: ["area"],
+      orderBy: { area: "asc" }
+    }),
+    prisma.map.findMany({
+      select: { name: true, slug: true },
+      orderBy: { name: "asc" }
     })
   ]);
 
   const counterMap = Object.fromEntries(counters.map((entry) => [entry.utilityType, entry._count]));
   const displayMapName = formatMapNameRu(map.name, map.slug);
+  const totalMapLineups = counters.reduce((sum, entry) => sum + entry._count, 0);
+  const filterAreas = areas.map((entry) => entry.area).filter((area): area is string => Boolean(area));
+  const mapOptions = Array.from(
+    allMaps
+      .reduce<Map<string, { name: string; slug: string }>>((accumulator, option) => {
+        const key = canonicalMapKey(option);
+        if (!accumulator.has(key)) {
+          accumulator.set(key, { name: key === "dust-2" ? "Dust 2" : option.name, slug: key });
+        }
+        return accumulator;
+      }, new Map())
+      .values()
+  ).sort((left, right) => left.name.localeCompare(right.name));
+  const markerLineups = lineups.map((lineup) => ({
+    slug: lineup.slug,
+    title: lineup.title,
+    utilityType: lineup.utilityType,
+    side: lineup.side,
+    area: lineup.area,
+    fromPosition: lineup.fromPosition,
+    targetPosition: lineup.targetPosition
+  }));
 
   return (
     <div className="space-y-8 pb-16">
@@ -155,6 +209,10 @@ export default async function MapPage({
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-orange-400/20 bg-orange-500/10 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.18em] text-orange-100">Всего</div>
+              <div className="mt-2 text-3xl font-black text-white">{totalMapLineups}</div>
+            </div>
             {["smoke", "flash", "molotov", "he", "oneway"].map((type) => (
               <div key={type} className="rounded-2xl border border-white/10 bg-black/30 p-4">
                 <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{formatUtilityTypeRu(type)}</div>
@@ -165,66 +223,63 @@ export default async function MapPage({
         </div>
       </section>
 
-      <form className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-[#0b0f18]/95 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.28)] lg:grid-cols-6" method="get">
-        <label className="space-y-2 text-sm">
-          <span className="text-slate-400">Тип гранаты</span>
-          <select name="utilityType" defaultValue={searchParams?.utilityType ?? ""} className="admin-input">
-            <option value="">Все</option>
-            <option value="smoke">{formatUtilityTypeRu("smoke")}</option>
-            <option value="flash">{formatUtilityTypeRu("flash")}</option>
-            <option value="molotov">{formatUtilityTypeRu("molotov")}</option>
-            <option value="he">{formatUtilityTypeRu("he")}</option>
-            <option value="oneway">{formatUtilityTypeRu("oneway")}</option>
-            <option value="unknown">{formatUtilityTypeRu("unknown")}</option>
-          </select>
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="text-slate-400">Сторона</span>
-          <select name="side" defaultValue={searchParams?.side ?? ""} className="admin-input">
-            <option value="">Все</option>
-            <option value="t">T</option>
-            <option value="ct">CT</option>
-            <option value="both">{formatSideRu("both")}</option>
-            <option value="unknown">{formatSideRu("unknown")}</option>
-          </select>
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="text-slate-400">Зона</span>
-          <input name="area" defaultValue={searchParams?.area ?? ""} className="admin-input" placeholder="A, B, MID, SHORT" />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="text-slate-400">Сложность</span>
-          <select name="difficulty" defaultValue={searchParams?.difficulty ?? ""} className="admin-input">
-            <option value="">Все</option>
-            <option value="easy">{formatDifficultyRu("easy")}</option>
-            <option value="medium">{formatDifficultyRu("medium")}</option>
-            <option value="hard">{formatDifficultyRu("hard")}</option>
-            <option value="unknown">{formatDifficultyRu("unknown")}</option>
-          </select>
-        </label>
-        <label className="flex items-end gap-3 pb-1 text-sm font-semibold text-slate-300 lg:pt-8">
-          <input type="checkbox" name="verifiedOnly" value="true" defaultChecked={parseBoolean(searchParams?.verifiedOnly)} className="h-5 w-5 rounded border-white/20 bg-[#05070d] accent-orange-500" />
-          Только проверенные
-        </label>
-        <div className="flex items-end lg:pt-6">
-          <button type="submit" className="admin-button w-full">
-            Применить
-          </button>
-        </div>
-      </form>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr),22rem]">
+        <div className="space-y-6">
+          <LineupMap mapName={displayMapName} mapImageUrl={map.imageUrl} lineups={markerLineups} />
 
-      {lineups.length ? (
-        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-          {lineups.map((lineup) => (
-            <LineupCard key={lineup.id} lineup={lineup} />
-          ))}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-[0.16em] text-orange-200">Список</div>
+                <h2 className="mt-1 text-3xl font-black text-white">Найденные раскидки</h2>
+              </div>
+              <p className="text-sm text-slate-400">{lineups.length} по текущим фильтрам</p>
+            </div>
+            {lineups.length ? (
+              <div className="grid gap-5 xl:grid-cols-2">
+                {lineups.map((lineup) => (
+                  <LineupCard key={lineup.id} lineup={lineup} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="По этой карте нет опубликованных раскидов под выбранные фильтры"
+                description="Попробуйте убрать часть фильтров или сначала провести импорт и модерацию через админку."
+              />
+            )}
+          </div>
         </div>
-      ) : (
-        <EmptyState
-          title="По этой карте нет опубликованных раскидов под выбранные фильтры"
-          description="Попробуйте убрать часть фильтров или сначала провести импорт и модерацию через админку."
-        />
-      )}
+        <div className="space-y-5">
+          <LineupFilters
+            mapName={displayMapName}
+            mapSlug={map.slug}
+            maps={mapOptions}
+            areas={filterAreas}
+            defaults={{
+              utilityType: searchParams?.utilityType,
+              side: searchParams?.side,
+              area: searchParams?.area,
+              difficulty: searchParams?.difficulty,
+              verifiedOnly: searchParams?.verifiedOnly
+            }}
+            resultsCount={lineups.length}
+          />
+          <div className="rounded-[1.5rem] border border-cyan-300/15 bg-cyan-400/[0.045] p-5">
+            <h2 className="text-lg font-black text-white">Больше раскидок в Telegram</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">Подписывайся на @cyberlineup — новые смоки, флешки и подборки по картам.</p>
+            <TrackedExternalLink
+              href="https://t.me/cyberlineup"
+              target="_blank"
+              rel="noreferrer"
+              goal="telegram_click"
+              params={{ source: "map_sidebar", map: displayMapName }}
+              className="mt-4 inline-flex rounded-xl border border-orange-400/35 bg-[#ff5500] px-4 py-3 text-sm font-extrabold text-white transition hover:bg-[#f97316]"
+            >
+              Открыть Telegram
+            </TrackedExternalLink>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
